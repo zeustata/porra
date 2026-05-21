@@ -2,7 +2,7 @@ const CACHE_NAME = 'porra-cache-v1';
 const urlsToCache = [
   '/porra/',
   '/porra/index.html',
-  '/porra/icon.svg',
+  '/porra/logo.png',
   '/porra/manifest.json'
 ];
 
