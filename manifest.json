@@ -1,0 +1,17 @@
+{
+  "name": "Porra Mundial 2026",
+  "short_name": "Porra 26",
+  "description": "La plataforma definitiva de pronósticos para el Mundial",
+  "start_url": "/porra/",
+  "display": "standalone",
+  "background_color": "#0f0c29",
+  "theme_color": "#0f0c29",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

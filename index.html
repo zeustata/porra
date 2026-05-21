@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Porra 26">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
     <style>
         :root {
             /* Tonos exóticos: Base muy oscura con brillos magenta y cian (estilo retrowave/tropical de noche) */
@@ -218,5 +226,54 @@
         </div>
     </div>
 
+    <!-- Banner de Instalación PWA -->
+    <div id="pwa-install-banner" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(15, 12, 41, 0.95); border: 1px solid var(--neon-cyan); border-radius: 12px; padding: 20px; z-index: 9999; backdrop-filter: blur(15px); text-align: center; box-shadow: 0 10px 30px rgba(0,242,254,0.3);">
+        <p style="margin-bottom: 15px; font-weight: 600; font-size: 1rem;">¡Instala la App de la Porra en tu pantalla de inicio!</p>
+        <button id="pwa-install-btn" style="background: var(--neon-cyan); color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem;">Instalar</button>
+        <button id="pwa-dismiss-btn" style="background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-left: 10px; font-size: 0.9rem;">Ahora no</button>
+    </div>
+
+    <!-- PWA Script -->
+    <script>
+        // 1. Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('ServiceWorker registrado con éxito'))
+                    .catch(err => console.log('Error al registrar ServiceWorker: ', err));
+            });
+        }
+
+        // 2. Lógica de Instalación (PWA Banner)
+        let deferredPrompt;
+        const installBanner = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevenir que el mini-infobar de Chrome aparezca en móvil
+            e.preventDefault();
+            // Guardar el evento para dispararlo luego
+            deferredPrompt = e;
+            // Mostrar nuestro propio banner personalizado
+            installBanner.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installBanner.style.display = 'none';
+            if (deferredPrompt) {
+                // Mostrar el prompt nativo de instalación
+                deferredPrompt.prompt();
+                // Esperar a la decisión del usuario
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+            }
+        });
+
+        dismissBtn.addEventListener('click', () => {
+            installBanner.style.display = 'none';
+        });
+    </script>
 </body>
 </html>
