@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Añadido viewport-fit=cover para compatibilidad total con móviles (notch, safe areas) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Porra Mundial 2026</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Tonos exóticos: Base muy oscura con brillos magenta y cian (estilo retrowave/tropical de noche) */
+            --bg-base: #0f0c29;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --neon-magenta: #ff007f;
+            --neon-cyan: #00f2fe;
+            --neon-gold: #ffcf00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Quita el resalto azul en móviles */
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            min-height: 100vh;
+            /* Fondo exótico con gradientes radiales intensos */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 207, 0, 0.1) 0%, transparent 60%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            /* Safe areas para móviles modernos (iPhone, etc.) */
+            padding: env(safe-area-inset-top, 1rem) env(safe-area-inset-right, 1rem) env(safe-area-inset-bottom, 2rem) env(safe-area-inset-left, 1rem);
+        }
+
+        header {
+            width: 100%;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        h1 {
+            /* Texto responsivo con clamp */
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            /* Gradiente en el texto */
+            background: linear-gradient(135deg, var(--text-light) 0%, var(--neon-cyan) 50%, var(--neon-magenta) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 2px 15px rgba(255,0,127,0.3));
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 0 1rem;
+            animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* EFECTO LIQUID GLASS (Copiado del Portal pero adaptado a oscuro) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px); /* Safari support */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 242, 254, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card h2 {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .glass-card h2 span.icon {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 10px rgba(255,207,0,0.5));
+        }
+
+        .placeholder-content {
+            flex-grow: 1;
+            padding: 2rem 1rem;
+            border-radius: 1rem;
+            /* Efecto hundido interior */
+            background: linear-gradient(145deg, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+            box-shadow: inset 0 2px 15px rgba(0,0,0,0.3);
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE DESIGN */
+        
+        /* Tablets (iPads, etc) */
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+            .glass-card {
+                padding: 2rem;
+            }
+            /* La tarjeta principal ocupa las dos columnas */
+            .glass-card.main {
+                grid-column: span 2;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .glass-card.main {
+                grid-column: span 3;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mundial 2026</h1>
+        <p class="subtitle">La Plataforma Definitiva de Pronósticos</p>
+    </header>
+
+    <div class="container">
+        <!-- Tarjeta Principal (Clasificación) -->
+        <div class="glass-card main">
+            <h2><span class="icon">🏆</span> Clasificación General</h2>
+            <div class="placeholder-content">
+                <p>Aquí se cargará la tabla de clasificación en tiempo real.</p>
+                <p style="font-size: 0.85rem; margin-top: 15px; color: var(--neon-cyan); letter-spacing: 2px; text-transform: uppercase; font-weight: 600;">Sincronizando datos...</p>
+            </div>
+        </div>
+
+        <!-- Tarjetas Secundarias -->
+        <div class="glass-card">
+            <h2><span class="icon">⚽</span> Partidos en Vivo</h2>
+            <div class="placeholder-content">
+                <p>Marcadores actualizados al instante</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2><span class="icon">🎯</span> Mi Boleto</h2>
+            <div class="placeholder-content">
+                <p>Gestiona tus pronósticos (1X2 y Goles)</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2><span class="icon">✨</span> Especiales</h2>
+            <div class="placeholder-content">
+                <p>Primer gol, Tarjetas, MVP y más...</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
