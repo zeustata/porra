@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reglas y Puntos - Porra Mundial 2026</title>
+    <!-- Mismas etiquetas PWA para que funcione igual -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Porra 26">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="logo.png" type="image/png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f0c29;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --neon-magenta: #ff007f;
+            --neon-cyan: #00f2fe;
+            --neon-gold: #ffcf00;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 207, 0, 0.1) 0%, transparent 60%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: env(safe-area-inset-top, 1rem) env(safe-area-inset-right, 1rem) env(safe-area-inset-bottom, 2rem) env(safe-area-inset-left, 1rem);
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 0 1rem; 
+            margin-top: 2rem;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        header { width: 100%; text-align: center; margin-bottom: 2rem; }
+
+        h1 { 
+            font-size: clamp(2rem, 6vw, 3rem); 
+            font-weight: 800; 
+            background: linear-gradient(135deg, var(--text-light) 0%, var(--neon-cyan) 50%, var(--neon-magenta) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            filter: drop-shadow(0 2px 15px rgba(255,0,127,0.3)); 
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--neon-cyan);
+            text-decoration: none;
+            border: 1px solid var(--neon-cyan);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover { 
+            background: var(--neon-cyan); 
+            color: #000; 
+            transform: translateX(-5px);
+        }
+
+        h2 { 
+            color: var(--neon-gold); 
+            margin: 2rem 0 1rem 0; 
+            font-size: 1.3rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            padding-bottom: 0.5rem; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        ul { list-style-type: none; }
+        li { 
+            margin-bottom: 1rem; 
+            line-height: 1.6; 
+            color: var(--text-muted); 
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--neon-cyan);
+        }
+        
+        strong { color: var(--text-light); }
+        .highlight { 
+            color: var(--neon-gold); 
+            font-weight: 800; 
+            font-size: 1.1rem;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← Volver al Panel</a>
+        
+        <header>
+            <h1>Reglas y Puntos</h1>
+        </header>
+
+        <div class="glass-card">
+            <h2>🏆 1. Fase de Grupos</h2>
+            <ul>
+                <li><strong>Acierto de signo (1X2):</strong> <span class="highlight">2 puntos</span>. <br><small>Nota: El signo es independiente de los goles exactos que pongas.</small></li>
+                <li><strong>Acierto de goles por equipo:</strong> <span class="highlight">1 punto</span> por cada equipo del que aciertes sus goles exactos.</li>
+                <li><strong>Pleno del Grupo:</strong> <span class="highlight">10 puntos</span> extra por acertar el orden exacto de clasificación de todo un grupo (del 1º al 4º).</li>
+            </ul>
+
+            <h2>⚔️ 2. Fase Eliminatoria</h2>
+            <ul>
+                <li><strong>Goles exactos:</strong> <span class="highlight">5 puntos</span>. <br><small>Solo cuenta si acertaste los dos equipos que juegan. Válido solo para los primeros 90 minutos.</small></li>
+                <li><strong>Clasificado a Dieciseisavos:</strong> <span class="highlight">5 puntos</span> por acierto</li>
+                <li><strong>Clasificado a Octavos:</strong> <span class="highlight">10 puntos</span> por acierto</li>
+                <li><strong>Clasificado a Cuartos:</strong> <span class="highlight">15 puntos</span> por acierto</li>
+                <li><strong>Clasificado a Semifinales:</strong> <span class="highlight">20 puntos</span> por acierto</li>
+                <li><strong>Tercer Puesto:</strong> <span class="highlight">25 puntos</span></li>
+                <li><strong>Finalista:</strong> <span class="highlight">30 puntos</span> por acierto</li>
+                <li><strong>Campeón del Mundo:</strong> <span class="highlight">50 puntos</span></li>
+            </ul>
+
+            <h2>✨ 3. Preguntas Especiales</h2>
+            <ul>
+                <li><strong>Generales:</strong> Entre <span class="highlight">1 y 4 puntos</span> (Ej: Primer gol del torneo, tarjetas rojas, penaltis...)</li>
+                <li><strong>Selección Española:</strong> Entre <span class="highlight">2 y 3 puntos</span> (Ej: Primer goleador español, goles encajados en grupos...)</li>
+                <li><strong>Fase Final:</strong> Grandes premios como Máximo Goleador (<span class="highlight">15 pts</span>) o MVP de la final (<span class="highlight">20 pts</span>).</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>
