@@ -165,5 +165,10 @@ function updateMatchesUI(matches) {
     });
 }
 
-// Iniciar al cargar la página
-window.addEventListener('DOMContentLoaded', initEngine);
+// Iniciar al cargar la página y configurar actualización automática (polling)
+window.addEventListener('DOMContentLoaded', () => {
+    initEngine(); // Primera carga inmediata
+    
+    // Configurar actualización en tiempo real cada 60 segundos (60000 ms)
+    setInterval(initEngine, 60000);
+});
