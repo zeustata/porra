@@ -271,12 +271,14 @@
 
     <div class="container">
         <!-- Tarjeta Principal (Clasificación) -->
-        <div class="glass-card main">
-            <h2><span class="icon">🏆</span> Clasificación General</h2>
-            <div class="placeholder-content">
-                <p>Aquí se cargará la tabla de clasificación en tiempo real.</p>
-                <p style="font-size: 0.85rem; margin-top: 15px; color: var(--neon-cyan); letter-spacing: 2px; text-transform: uppercase; font-weight: 600;">Sincronizando datos...</p>
+        <div class="glass-card main-card">
+            <h2>🏆 Clasificación General</h2>
+            <div class="leaderboard">
+                <div id="leaderboard-list" style="display:flex; flex-direction:column;">
+                    <p style="text-align:center; color:var(--text-muted);">Cargando clasificación en tiempo real...</p>
+                </div>
             </div>
+            <button style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer;">Ver Completa</button>
         </div>
 
         <!-- Tarjetas Secundarias -->
@@ -284,6 +286,13 @@
             <h2><span class="icon">⚽</span> Partidos en Vivo</h2>
             <div class="placeholder-content">
                 <p>Marcadores actualizados al instante</p>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2>⚽ Partidos de Hoy</h2>
+            <div id="matches-container" style="display:flex; flex-direction:column;">
+                <p style="text-align:center; color:var(--text-muted);">Cargando resultados...</p>
             </div>
         </div>
 
@@ -334,6 +343,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/api-engine.js"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
