@@ -4,6 +4,7 @@
 const API_KEY = "7588a7d31cb05d8cebc445333011ae30";
 
 // La lista de participantes se cierra el 5 de junio
+let allParticipants = [];
 
 // Función principal que inicializa el motor
 async function initEngine() {
@@ -12,6 +13,8 @@ async function initEngine() {
         const responsePart = await fetch('data/participants.json');
         if (!responsePart.ok) throw new Error('No se pudo cargar participants.json');
         const participants = await responsePart.json();
+        allParticipants = participants;
+        populateParticipantSelect(participants);
         
         // 2. Conectar a la API real
         let realResults = [];
@@ -166,3 +169,53 @@ window.addEventListener('DOMContentLoaded', () => {
     // Configurar actualización en tiempo real cada 60 segundos (60000 ms)
     setInterval(initEngine, 60000);
 });
+
+// --- Lógica del Buscador de Pronósticos ---
+function populateParticipantSelect(participants) {
+    const select = document.getElementById('participant-select');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecciona un participante...</option>';
+    
+    participants.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        option.textContent = p.name;
+        select.appendChild(option);
+    });
+
+    select.addEventListener('change', (e) => {
+        showParticipantPredictions(e.target.value);
+    });
+}
+
+function showParticipantPredictions(participantId) {
+    const container = document.getElementById('participant-predictions');
+    if (!container) return;
+
+    if (!participantId) {
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">Elige alguien para ver sus apuestas</p>';
+        return;
+    }
+
+    const p = allParticipants.find(p => p.id == participantId);
+    if (!p || !p.predictions || !p.predictions.matches) {
+        container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No hay pronósticos disponibles.</p>';
+        return;
+    }
+
+    let html = '';
+    p.predictions.matches.forEach(m => {
+        html += `
+            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+                <span>${m.homeTeam}</span>
+                <span style="color:var(--neon-cyan); font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
+                <span>${m.awayTeam}</span>
+            </div>
+        `;
+    });
+    
+    html += `<div style="text-align:center; margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Puntos especiales: ${p.predictions.specialPoints || 0}</div>`;
+
+    container.innerHTML = html;
+}
