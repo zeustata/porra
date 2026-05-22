@@ -3,11 +3,7 @@
 
 const API_KEY = "7588a7d31cb05d8cebc445333011ae30";
 
-// Datos de fallback por si no hay partidos en directo ahora mismo
-const mockRealResults = [
-    { matchId: 101, homeTeam: "España", awayTeam: "Croacia", homeGoals: 3, awayGoals: 0, status: "FINISHED" },
-    { matchId: 102, homeTeam: "Brasil", awayTeam: "Serbia", homeGoals: 2, awayGoals: 0, status: "FINISHED" }
-];
+// La lista de participantes se cierra el 5 de junio
 
 // Función principal que inicializa el motor
 async function initEngine() {
@@ -34,36 +30,24 @@ async function initEngine() {
             });
             const data = await responseApi.json();
             
-            // Si hay partidos en directo, mapeamos los 2 primeros para la prueba
+            // Mapeamos los partidos en directo reales
             if (data && data.response && data.response.length > 0) {
-                const live1 = data.response[0];
-                const live2 = data.response.length > 1 ? data.response[1] : mockRealResults[1];
-                
-                realResults = [
-                    { 
-                        matchId: 101, 
-                        homeTeam: live1.teams.home.name, 
-                        awayTeam: live1.teams.away.name, 
-                        homeGoals: live1.goals.home || 0, 
-                        awayGoals: live1.goals.away || 0, 
-                        status: "FINISHED" 
-                    },
-                    { 
-                        matchId: 102, 
-                        homeTeam: live2.teams?.home?.name || live2.homeTeam, 
-                        awayTeam: live2.teams?.away?.name || live2.awayTeam, 
-                        homeGoals: live2.goals?.home || live2.homeGoals || 0, 
-                        awayGoals: live2.goals?.away || live2.awayGoals || 0, 
-                        status: "FINISHED" 
-                    }
-                ];
+                realResults = data.response.map(match => ({
+                    matchId: match.fixture.id,
+                    homeTeam: match.teams.home.name,
+                    awayTeam: match.teams.away.name,
+                    homeGoals: match.goals.home || 0,
+                    awayGoals: match.goals.away || 0,
+                    // Si status.short está entre estos valores, el partido ha finalizado
+                    status: ["FT", "AET", "PEN"].includes(match.fixture.status.short) ? "FINISHED" : "LIVE"
+                }));
             } else {
-                console.log("No hay partidos en directo ahora mismo. Usando simulación.");
-                realResults = mockRealResults;
+                console.log("No hay partidos en directo ahora mismo.");
+                realResults = [];
             }
         } catch (apiError) {
-            console.error("Error conectando a la API, usando simulación:", apiError);
-            realResults = mockRealResults;
+            console.error("Error conectando a la API:", apiError);
+            realResults = [];
         }
 
         // 3. Calcular puntos y pintar en pantalla
@@ -122,6 +106,11 @@ function updateLeaderboardUI(leaderboard) {
     if (!list) return;
 
     list.innerHTML = '';
+    
+    if (leaderboard.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aún no hay participantes (cierre el 5 de junio).</p>';
+        return;
+    }
     leaderboard.forEach((p, index) => {
         const item = document.createElement('div');
         item.className = 'leaderboard-item';
@@ -146,6 +135,11 @@ function updateMatchesUI(matches) {
     if (!container) return;
 
     container.innerHTML = '';
+    
+    if (matches.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
+        return;
+    }
     matches.forEach(m => {
         const matchDiv = document.createElement('div');
         matchDiv.style.background = 'rgba(0,0,0,0.3)';
