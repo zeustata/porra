@@ -19,10 +19,10 @@ async function initEngine() {
         // 2. Conectar a la API real
         let realResults = [];
         try {
-            // Filtramos específicamente para el Mundial 2026 (League ID: 1 en API-Sports)
-            const WORLD_CUP_ID = 1;
-            const SEASON = 2026;
-            const apiUrl = `https://v3.football.api-sports.io/fixtures?league=${WORLD_CUP_ID}&season=${SEASON}&live=all`;
+            // En API-Sports, si pasas 'live=all' ignora el filtro de liga y te devuelve todos.
+            // Para filtrar directos por liga concreta hay que pasar su ID directo al parámetro 'live'.
+            const WORLD_CUP_ID = 1; // ID oficial de la Copa del Mundo
+            const apiUrl = `https://v3.football.api-sports.io/fixtures?live=${WORLD_CUP_ID}`;
             
             const responseApi = await fetch(apiUrl, {
                 method: 'GET',
