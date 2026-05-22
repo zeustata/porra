@@ -57,6 +57,9 @@ async function initEngine() {
         const leaderboard = calculateScores(participants, realResults);
         updateLeaderboardUI(leaderboard);
         updateMatchesUI(realResults);
+        
+        // 4. Cargar últimas noticias
+        fetchNews();
 
     } catch (error) {
         console.error("Error inicializando el motor:", error);
@@ -216,6 +219,52 @@ function showParticipantPredictions(participantId) {
     });
     
     html += `<div style="text-align:center; margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Puntos especiales: ${p.predictions.specialPoints || 0}</div>`;
+
+    container.innerHTML = html;
+}
+
+// --- Lógica de Noticias RSS ---
+async function fetchNews() {
+    const container = document.getElementById('news-container');
+    if (!container) return;
+
+    try {
+        // Usamos rss2json para convertir el RSS de Google News a formato JSON fácilmente procesable
+        const rssUrl = encodeURIComponent('https://news.google.com/rss/search?q=Mundial+2026+futbol&hl=es&gl=ES&ceid=ES:es');
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
+        
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Error en rss2json');
+        
+        const data = await response.json();
+        if (data.status === 'ok' && data.items && data.items.length > 0) {
+            updateNewsUI(data.items.slice(0, 5)); // Mostrar las 5 últimas noticias
+        } else {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">No se encontraron noticias recientes.</p>';
+        }
+    } catch (error) {
+        console.error("Error cargando noticias:", error);
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">No se pudieron cargar las noticias en este momento.</p>';
+    }
+}
+
+function updateNewsUI(articles) {
+    const container = document.getElementById('news-container');
+    if (!container) return;
+
+    let html = '';
+    articles.forEach(article => {
+        // Formatear la fecha (ej. "hace 2 horas" o la fecha corta)
+        const dateObj = new Date(article.pubDate);
+        const dateStr = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' });
+        
+        html += `
+            <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="news-item">
+                <span class="news-title">${article.title}</span>
+                <span class="news-date">📅 ${dateStr}</span>
+            </a>
+        `;
+    });
 
     container.innerHTML = html;
 }
