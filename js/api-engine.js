@@ -1,6 +1,9 @@
 // api-engine.js
-// Motor para calcular los puntos basados en los pronósticos y los resultados reales simulados
+// Motor para calcular los puntos basados en los pronósticos y los resultados reales
 
+const API_KEY = "7588a7d31cb05d8cebc445333011ae30";
+
+// Datos de fallback por si no hay partidos en directo ahora mismo
 const mockRealResults = [
     { matchId: 101, homeTeam: "España", awayTeam: "Croacia", homeGoals: 3, awayGoals: 0, status: "FINISHED" },
     { matchId: 102, homeTeam: "Brasil", awayTeam: "Serbia", homeGoals: 2, awayGoals: 0, status: "FINISHED" }
@@ -9,14 +12,58 @@ const mockRealResults = [
 // Función principal que inicializa el motor
 async function initEngine() {
     try {
-        // En el futuro, fetch('/porra/data/participants.json')
-        const response = await fetch('data/participants.json');
-        if (!response.ok) throw new Error('No se pudo cargar participants.json');
-        const participants = await response.json();
+        // 1. Cargar pronósticos de los participantes
+        const responsePart = await fetch('data/participants.json');
+        if (!responsePart.ok) throw new Error('No se pudo cargar participants.json');
+        const participants = await responsePart.json();
         
-        const leaderboard = calculateScores(participants, mockRealResults);
+        // 2. Conectar a la API real
+        let realResults = [];
+        try {
+            const responseApi = await fetch("https://v3.football.api-sports.io/fixtures?live=all", {
+                method: 'GET',
+                headers: {
+                    "x-apisports-key": API_KEY
+                }
+            });
+            const data = await responseApi.json();
+            
+            // Si hay partidos en directo, mapeamos los 2 primeros para la prueba
+            if (data && data.response && data.response.length > 0) {
+                const live1 = data.response[0];
+                const live2 = data.response.length > 1 ? data.response[1] : mockRealResults[1];
+                
+                realResults = [
+                    { 
+                        matchId: 101, 
+                        homeTeam: live1.teams.home.name, 
+                        awayTeam: live1.teams.away.name, 
+                        homeGoals: live1.goals.home || 0, 
+                        awayGoals: live1.goals.away || 0, 
+                        status: "FINISHED" 
+                    },
+                    { 
+                        matchId: 102, 
+                        homeTeam: live2.teams?.home?.name || live2.homeTeam, 
+                        awayTeam: live2.teams?.away?.name || live2.awayTeam, 
+                        homeGoals: live2.goals?.home || live2.homeGoals || 0, 
+                        awayGoals: live2.goals?.away || live2.awayGoals || 0, 
+                        status: "FINISHED" 
+                    }
+                ];
+            } else {
+                console.log("No hay partidos en directo ahora mismo. Usando simulación.");
+                realResults = mockRealResults;
+            }
+        } catch (apiError) {
+            console.error("Error conectando a la API, usando simulación:", apiError);
+            realResults = mockRealResults;
+        }
+
+        // 3. Calcular puntos y pintar en pantalla
+        const leaderboard = calculateScores(participants, realResults);
         updateLeaderboardUI(leaderboard);
-        updateMatchesUI(mockRealResults);
+        updateMatchesUI(realResults);
 
     } catch (error) {
         console.error("Error inicializando el motor:", error);
