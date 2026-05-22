@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v1';
+const CACHE_NAME = 'porra-cache-v2';
 const urlsToCache = [
   '/porra/',
   '/porra/index.html',
