@@ -160,6 +160,65 @@
             border: 1px solid rgba(255,255,255,0.03);
         }
 
+        /* Accordion / Desplegable */
+        .expandable-card {
+            cursor: pointer;
+        }
+        
+        .expandable-card h2 {
+            margin-bottom: 0 !important;
+        }
+
+        .chevron-icon {
+            transition: transform 0.3s ease;
+            margin-left: auto;
+            font-size: 1rem !important;
+            filter: none !important;
+            color: var(--text-muted);
+        }
+
+        .glass-card.active .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        .content-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-in, padding 0.3s ease, margin 0.3s ease;
+            opacity: 0;
+        }
+
+        .glass-card.active .content-panel {
+            max-height: 800px; 
+            opacity: 1;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 1rem;
+        }
+        
+        /* Botones de recursos */
+        .resource-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .resource-btn:last-child { margin-bottom: 0; }
+        .resource-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+
         /* Animations */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
@@ -241,10 +300,13 @@
         </div>
 
         <!-- Nueva tarjeta de Recursos -->
-        <div class="glass-card">
-            <h2><span class="icon">📦</span> Recursos</h2>
-            <div class="placeholder-content">
-                <p>Descargas, plantillas y enlaces útiles</p>
+        <div class="glass-card expandable-card" onclick="this.classList.toggle('active')">
+            <h2><span class="icon">📦</span> Recursos <span class="chevron-icon">▼</span></h2>
+            <div class="content-panel" onclick="event.stopPropagation()">
+                <p style="margin-bottom: 1rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">Haz clic para ver o descargar</p>
+                <a href="recurso1.png" target="_blank" class="resource-btn">📥 Plantilla Grupos</a>
+                <a href="recurso2.png" target="_blank" class="resource-btn">📥 Plantilla Eliminatorias</a>
+                <a href="recurso3.png" target="_blank" class="resource-btn">📥 Plantilla Puntuación</a>
             </div>
         </div>
     </div>
