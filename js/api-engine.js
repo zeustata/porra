@@ -20,6 +20,12 @@ async function initEngine() {
         // 2. Conectar a la API real
         let realResults = [];
         try {
+            // NOTA: Para filtrar solo por el Mundial 2026, usaremos estos parámetros en el futuro:
+            // const WORLD_CUP_ID = 1; // (Hay que confirmar el ID oficial del Mundial en API-Football)
+            // const SEASON = 2026;
+            // const url = `https://v3.football.api-sports.io/fixtures?league=${WORLD_CUP_ID}&season=${SEASON}&live=all`;
+            
+            // Para las pruebas actuales, cogemos cualquier partido en directo del mundo:
             const responseApi = await fetch("https://v3.football.api-sports.io/fixtures?live=all", {
                 method: 'GET',
                 headers: {
