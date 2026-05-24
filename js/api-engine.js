@@ -69,32 +69,89 @@ function calculateScores(participants, realResults) {
     let leaderboard = [];
 
     participants.forEach(p => {
+        // 1. Puntos de Preguntas Especiales (hasta 100)
         let totalPoints = p.predictions.specialPoints || 0;
 
-        p.predictions.matches.forEach(pred => {
-            const real = realResults.find(r => r.matchId === pred.matchId);
-            if (real && real.status === "FINISHED") {
-                // 1. Calcular el signo real (1X2)
-                let realSign = "X";
-                if (real.homeGoals > real.awayGoals) realSign = "1";
-                if (real.homeGoals < real.awayGoals) realSign = "2";
+        // 2. Partidos de Fase de Grupos
+        if (p.predictions.matches) {
+            p.predictions.matches.forEach(pred => {
+                const real = realResults.find(r => r.matchId === pred.matchId);
+                if (real && real.status === "FINISHED") {
+                    // Signo (1X2) -> 2 Puntos
+                    let realSign = "X", predSign = "X";
+                    if (real.homeGoals > real.awayGoals) realSign = "1";
+                    if (real.homeGoals < real.awayGoals) realSign = "2";
+                    if (pred.homeGoals > pred.awayGoals) predSign = "1";
+                    if (pred.homeGoals < pred.awayGoals) predSign = "2";
 
-                // Puntos por signo
-                if (pred.sign === realSign) {
-                    totalPoints += 2;
+                    if (predSign === realSign) {
+                        totalPoints += 2;
+                    }
+
+                    // Goles exactos -> 1 Punto por equipo
+                    if (pred.homeGoals === real.homeGoals) totalPoints += 1;
+                    if (pred.awayGoals === real.awayGoals) totalPoints += 1;
+                }
+            });
+        }
+
+        // 3. Clasificación de Grupos (Ejemplo de estructura futura)
+        if (p.predictions.groupStandings && realResults.groupStandings) {
+            Object.keys(p.predictions.groupStandings).forEach(groupId => {
+                const predGroup = p.predictions.groupStandings[groupId]; // ej: ["ESP", "GER", "JPN", "CRC"]
+                const realGroup = realResults.groupStandings[groupId];
+                
+                // Asumimos que los 2 primeros se clasifican (o los que indique la regla del torneo)
+                const realClassified = realGroup.slice(0, 2); 
+                const predClassified = predGroup.slice(0, 2);
+
+                predClassified.forEach(team => {
+                    if (realClassified.includes(team)) {
+                        totalPoints += 5; // Acertó que el equipo se clasifica
+                    }
+                });
+
+                predGroup.forEach((team, index) => {
+                    if (realGroup[index] === team) {
+                        totalPoints += 3; // Acertó la posición exacta en el grupo
+                    }
+                });
+            });
+        }
+
+        // 4. Fase Eliminatoria (Cruces y Goles)
+        if (p.predictions.knockouts && realResults.knockouts) {
+            // Ejemplo iterando sobre los partidos eliminatorios
+            p.predictions.knockouts.forEach(predMatch => {
+                const realMatch = realResults.knockouts.find(r => r.matchId === predMatch.matchId);
+                
+                // A) Acierto de equipos que llegan a este cruce
+                // Si el pronóstico dice que España llega a la Final, y en la realidad España llega a la Final
+                if (realMatch && realMatch.homeTeam === predMatch.homeTeam) {
+                    totalPoints += getPointsForRound(predMatch.round); 
+                }
+                if (realMatch && realMatch.awayTeam === predMatch.awayTeam) {
+                    totalPoints += getPointsForRound(predMatch.round);
                 }
 
-                // Puntos por goles exactos del equipo local
-                if (pred.homeGoals === real.homeGoals) {
-                    totalPoints += 1;
+                // B) Goles exactos en eliminatoria (90 min) -> 10 pts
+                // Condición: Solo si acertó los dos equipos que jugaban este partido
+                if (realMatch && realMatch.status === "FINISHED" && 
+                    realMatch.homeTeam === predMatch.homeTeam && 
+                    realMatch.awayTeam === predMatch.awayTeam) {
+                    
+                    if (realMatch.homeGoals === predMatch.homeGoals && realMatch.awayGoals === predMatch.awayGoals) {
+                        totalPoints += 10;
+                    }
                 }
+            });
+        }
 
-                // Puntos por goles exactos del equipo visitante
-                if (pred.awayGoals === real.awayGoals) {
-                    totalPoints += 1;
-                }
-            }
-        });
+        // 5. Premios Finales
+        if (p.predictions.finalAwards && realResults.finalAwards) {
+            if (p.predictions.finalAwards.champion === realResults.finalAwards.champion) totalPoints += 50;
+            if (p.predictions.finalAwards.thirdPlace === realResults.finalAwards.thirdPlace) totalPoints += 25;
+        }
 
         leaderboard.push({ name: p.name, points: totalPoints });
     });
@@ -102,6 +159,18 @@ function calculateScores(participants, realResults) {
     // Ordenar de mayor a menor
     leaderboard.sort((a, b) => b.points - a.points);
     return leaderboard;
+}
+
+function getPointsForRound(roundName) {
+    switch(roundName) {
+        case 'Octavos': return 5;
+        case 'Cuartos': return 10;
+        case 'Semifinales': return 15;
+        case 'TercerPuesto': return 25;
+        case 'Final': return 20;
+        case 'Finalista': return 30; // Si se gestiona como premio separado
+        default: return 0;
+    }
 }
 
 // Actualizar el DOM

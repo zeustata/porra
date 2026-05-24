@@ -3,22 +3,40 @@
 ## Concepto
 Un sistema modular y escalable para gestionar "porras" o predicciones de torneos deportivos (ej. Mundial 2026). El sistema está diseñado para que el "motor" de cálculo de puntos sea genérico y permita añadir diferentes sistemas de puntuación o reglas para futuros torneos.
 
-## Reglas Base (Mundial 2026)
+## Reglas Base Oficiales (Mundial 2026)
+*Límite de inscripción: 5 de Junio.*
 
 ### 1. Fase de Grupos
-- **Acierto de signo (1X2):** 2 puntos. (Nota: El signo es independiente de los goles exactos pronosticados).
-- **Acierto de goles por equipo:** 1 punto por cada equipo del que se acierten sus goles exactos en un partido.
-- **Pleno del Grupo:** 10 puntos por acertar el orden exacto de clasificación de un grupo (1º al 4º).
+- **Goles exactos:** 1 punto por cada equipo del que se acierten sus goles exactos en un partido.
+- **Signo (1X2):** 2 puntos por acertar el resultado final.
 
-### 2. Fase Eliminatoria (Knockouts)
-- **Clasificados por rondas:** 1/16 (5 pts), Octavos (10 pts), Cuartos (15 pts), Semis (20 pts), Final (30 pts), 3º Puesto (25 pts), Campeón (50 pts).
-- **Goles exactos en eliminatoria:** 5 puntos. Condición: solo si se han acertado los dos equipos que juegan ese partido. Solo se tienen en cuenta los primeros 90 minutos.
+### 2. Clasificación Fase de Grupos
+- **Equipos clasificados:** 5 puntos por cada equipo acertado que se clasifique (da igual el orden).
+- **Orden exacto:** 3 puntos por cada acierto en el orden de clasificación exacto.
 
-### 3. Preguntas Especiales
-Preguntas personalizadas que otorgan puntos variables y que se gestionarán de forma manual por el administrador.
-- **Generales:** (1 a 4 puntos)
-- **España:** (2 a 3 puntos)
-- **Fase Final:** (hasta 20 puntos, ej. MVP o Máximo Goleador)
+### 3. Fase Eliminatoria
+*Se abrirá un único periodo entre el último partido de grupos y la primera eliminatoria.*
+- **Goles exactos en 90 min:** 10 puntos por partido.
+- **Clasificados a Octavos:** 5 puntos por acierto.
+- **Clasificados a Cuartos:** 10 puntos por acierto.
+- **Clasificados a Semifinales:** 15 puntos por acierto.
+- **Clasificados a la Final:** 20 puntos por acierto.
+- **3er y 4º Puesto:** 25 puntos por acierto.
+- **Finalista:** 30 puntos por acierto.
+*Nota: Puntos de esta fase supeditados a los cruces pronosticados.*
+
+### 4. Premios Finales y Preguntas
+- **Tercer Clasificado del Mundial:** 25 puntos.
+- **Campeón del Mundial:** 50 puntos.
+- **Preguntas Varias:** 26 preguntas, 100 puntos en total.
+
+### 5. Distribución de Premios
+- 1º: 40%
+- 2º: 25%
+- 3º: 15%
+- 4º: 10%
+- 5º: 5%
+- Mejor en preguntas: 5%
 
 ## Arquitectura Híbrida Propuesta
 1. **Automatización (Partidos):** Conexión a una API deportiva externa para actualizar resultados en tiempo real y recalcular las puntuaciones de goles/clasificados automáticamente.
