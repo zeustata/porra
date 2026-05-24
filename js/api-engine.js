@@ -76,8 +76,9 @@ function calculateScores(participants, realResults) {
         if (p.predictions.matches) {
             p.predictions.matches.forEach(pred => {
                 const real = realResults.find(r => r.matchId === pred.matchId);
-                if (real && real.status === "FINISHED") {
-                    // Signo (1X2) -> 2 Puntos
+                // ¡AQUÍ ESTÁ LA MAGIA!: Calculamos puntos tanto si ha terminado como si está EN JUEGO
+                if (real && (real.status === "FINISHED" || real.status === "LIVE")) {
+                    // Signo (1X2) provisional o final -> 2 Puntos
                     let realSign = "X", predSign = "X";
                     if (real.homeGoals > real.awayGoals) realSign = "1";
                     if (real.homeGoals < real.awayGoals) realSign = "2";
@@ -88,7 +89,7 @@ function calculateScores(participants, realResults) {
                         totalPoints += 2;
                     }
 
-                    // Goles exactos -> 1 Punto por equipo
+                    // Goles exactos provisionales o finales -> 1 Punto por equipo
                     if (pred.homeGoals === real.homeGoals) totalPoints += 1;
                     if (pred.awayGoals === real.awayGoals) totalPoints += 1;
                 }
@@ -134,9 +135,9 @@ function calculateScores(participants, realResults) {
                     totalPoints += getPointsForRound(predMatch.round);
                 }
 
-                // B) Goles exactos en eliminatoria (90 min) -> 10 pts
+                // B) Goles exactos en eliminatoria (90 min) -> 10 pts provisionales o finales
                 // Condición: Solo si acertó los dos equipos que jugaban este partido
-                if (realMatch && realMatch.status === "FINISHED" && 
+                if (realMatch && (realMatch.status === "FINISHED" || realMatch.status === "LIVE") && 
                     realMatch.homeTeam === predMatch.homeTeam && 
                     realMatch.awayTeam === predMatch.awayTeam) {
                     
