@@ -70,7 +70,8 @@ function calculateScores(participants, realResults) {
 
     participants.forEach(p => {
         // 1. Puntos de Preguntas Especiales (hasta 100)
-        let totalPoints = p.predictions.specialPoints || 0;
+        let basePoints = p.predictions.specialPoints || 0;
+        let livePoints = 0;
 
         // 2. Partidos de Fase de Grupos
         if (p.predictions.matches) {
@@ -78,6 +79,7 @@ function calculateScores(participants, realResults) {
                 const real = realResults.find(r => r.matchId === pred.matchId);
                 // ¡AQUÍ ESTÁ LA MAGIA!: Calculamos puntos tanto si ha terminado como si está EN JUEGO
                 if (real && (real.status === "FINISHED" || real.status === "LIVE")) {
+                    let pts = 0;
                     // Signo (1X2) provisional o final -> 2 Puntos
                     let realSign = "X", predSign = "X";
                     if (real.homeGoals > real.awayGoals) realSign = "1";
@@ -86,12 +88,18 @@ function calculateScores(participants, realResults) {
                     if (pred.homeGoals < pred.awayGoals) predSign = "2";
 
                     if (predSign === realSign) {
-                        totalPoints += 2;
+                        pts += 2;
                     }
 
                     // Goles exactos provisionales o finales -> 1 Punto por equipo
-                    if (pred.homeGoals === real.homeGoals) totalPoints += 1;
-                    if (pred.awayGoals === real.awayGoals) totalPoints += 1;
+                    if (pred.homeGoals === real.homeGoals) pts += 1;
+                    if (pred.awayGoals === real.awayGoals) pts += 1;
+                    
+                    if (real.status === "LIVE") {
+                        livePoints += pts;
+                    } else {
+                        basePoints += pts;
+                    }
                 }
             });
         }
@@ -108,13 +116,13 @@ function calculateScores(participants, realResults) {
 
                 predClassified.forEach(team => {
                     if (realClassified.includes(team)) {
-                        totalPoints += 5; // Acertó que el equipo se clasifica
+                        basePoints += 5; // Acertó que el equipo se clasifica
                     }
                 });
 
                 predGroup.forEach((team, index) => {
                     if (realGroup[index] === team) {
-                        totalPoints += 3; // Acertó la posición exacta en el grupo
+                        basePoints += 3; // Acertó la posición exacta en el grupo
                     }
                 });
             });
@@ -129,10 +137,10 @@ function calculateScores(participants, realResults) {
                 // A) Acierto de equipos que llegan a este cruce
                 // Si el pronóstico dice que España llega a la Final, y en la realidad España llega a la Final
                 if (realMatch && realMatch.homeTeam === predMatch.homeTeam) {
-                    totalPoints += getPointsForRound(predMatch.round); 
+                    basePoints += getPointsForRound(predMatch.round); 
                 }
                 if (realMatch && realMatch.awayTeam === predMatch.awayTeam) {
-                    totalPoints += getPointsForRound(predMatch.round);
+                    basePoints += getPointsForRound(predMatch.round);
                 }
 
                 // B) Goles exactos en eliminatoria (90 min) -> 10 pts provisionales o finales
@@ -142,7 +150,11 @@ function calculateScores(participants, realResults) {
                     realMatch.awayTeam === predMatch.awayTeam) {
                     
                     if (realMatch.homeGoals === predMatch.homeGoals && realMatch.awayGoals === predMatch.awayGoals) {
-                        totalPoints += 10;
+                        if (realMatch.status === "LIVE") {
+                            livePoints += 10;
+                        } else {
+                            basePoints += 10;
+                        }
                     }
                 }
             });
@@ -150,11 +162,12 @@ function calculateScores(participants, realResults) {
 
         // 5. Premios Finales
         if (p.predictions.finalAwards && realResults.finalAwards) {
-            if (p.predictions.finalAwards.champion === realResults.finalAwards.champion) totalPoints += 50;
-            if (p.predictions.finalAwards.thirdPlace === realResults.finalAwards.thirdPlace) totalPoints += 25;
+            if (p.predictions.finalAwards.champion === realResults.finalAwards.champion) basePoints += 50;
+            if (p.predictions.finalAwards.thirdPlace === realResults.finalAwards.thirdPlace) basePoints += 25;
         }
-
-        leaderboard.push({ name: p.name, points: totalPoints });
+        
+        let totalPoints = basePoints + livePoints;
+        leaderboard.push({ name: p.name, points: totalPoints, basePoints: basePoints, livePoints: livePoints });
     });
 
     // Ordenar de mayor a menor
@@ -199,7 +212,12 @@ function updateLeaderboardUI(leaderboard) {
         else if (index === 2) medal = '🥉 ';
         else medal = `${index + 1}. `;
 
-        item.innerHTML = `<span>${medal}${p.name}</span> <strong style="color:var(--neon-cyan)">${p.points} pts</strong>`;
+        let pointsHtml = `<strong style="color:var(--neon-cyan)">${p.basePoints} pts</strong>`;
+        if (p.livePoints > 0) {
+            pointsHtml = `<strong style="color:var(--neon-cyan)">${p.basePoints}</strong> <strong style="color:var(--neon-gold); font-size: 0.9em; animation: pulse 1.5s infinite;">+${p.livePoints} live 🔴</strong>`;
+        }
+
+        item.innerHTML = `<span>${medal}${p.name}</span> <span>${pointsHtml}</span>`;
         list.appendChild(item);
     });
 }
