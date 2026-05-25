@@ -338,10 +338,17 @@ function updateMatchesUI(matches, nextMatch = null) {
             matchDiv.style.justifyContent = 'space-between';
             matchDiv.style.alignItems = 'center';
 
+            let middleContent = '';
+            if (m.status === "LIVE") {
+                middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN DIRECTO</span>`;
+            } else {
+                middleContent = `<span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>`;
+            }
+
             matchDiv.innerHTML = `
-                <span>${m.homeTeam}</span>
-                <span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
-                <span>${m.awayTeam}</span>
+                <span style="flex:1; text-align:right;">${m.homeTeam}</span>
+                <div style="flex:1; display:flex; justify-content:center;">${middleContent}</div>
+                <span style="flex:1; text-align:left;">${m.awayTeam}</span>
             `;
             container.appendChild(matchDiv);
         });
