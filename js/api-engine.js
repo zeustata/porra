@@ -267,18 +267,42 @@ function getPointsForRound(roundName) {
     }
 }
 
+// Variables globales para el estado de la tabla
+let showFullLeaderboard = false;
+let lastLeaderboard = [];
+
+window.toggleLeaderboard = function() {
+    showFullLeaderboard = !showFullLeaderboard;
+    updateLeaderboardUI(lastLeaderboard);
+};
+
 // Actualizar el DOM
 function updateLeaderboardUI(leaderboard) {
+    lastLeaderboard = leaderboard;
     const list = document.getElementById('leaderboard-list');
+    const btnVerCompleta = document.getElementById('btn-ver-completa');
     if (!list) return;
 
     list.innerHTML = '';
     
     if (leaderboard.length === 0) {
         list.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Aún no hay participantes (cierre el 5 de junio).</p>';
+        if (btnVerCompleta) btnVerCompleta.style.display = 'none';
         return;
     }
-    leaderboard.forEach((p, index) => {
+    
+    let itemsToShow = showFullLeaderboard ? leaderboard : leaderboard.slice(0, 5);
+    
+    if (leaderboard.length > 5) {
+        if (btnVerCompleta) {
+            btnVerCompleta.style.display = 'block';
+            btnVerCompleta.innerText = showFullLeaderboard ? 'Ver Menos' : 'Ver Completa';
+        }
+    } else {
+        if (btnVerCompleta) btnVerCompleta.style.display = 'none';
+    }
+
+    itemsToShow.forEach((p, index) => {
         const item = document.createElement('div');
         item.className = 'leaderboard-item';
         item.style.display = 'flex';
