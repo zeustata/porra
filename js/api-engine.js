@@ -340,7 +340,7 @@ function updateMatchesUI(matches, nextMatch = null) {
 
             let middleContent = '';
             if (m.status === "LIVE") {
-                middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN DIRECTO</span>`;
+                middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN JUEGO</span>`;
             } else {
                 middleContent = `<span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>`;
             }
