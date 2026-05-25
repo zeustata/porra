@@ -1,9 +1,10 @@
 const CACHE_NAME = 'porra-cache-v2';
 const urlsToCache = [
-  '/porra/',
-  '/porra/index.html',
-  '/porra/logo.png',
-  '/porra/manifest.json'
+  './',
+  './index.html',
+  './logo.png',
+  './manifest.json',
+  './css/style.css'
 ];
 
 self.addEventListener('install', event => {
