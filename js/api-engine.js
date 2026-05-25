@@ -16,20 +16,39 @@ async function initEngine() {
         allParticipants = participants;
         populateParticipantSelect(participants);
         
-        // 2. Conectar a la API real
+        // 2. Conectar a la API real con sistema de caché (60s)
         let realResults = [];
         try {
-            const WORLD_CUP_ID = 1; // ID oficial de la Copa del Mundo
-            // Añadimos live=all y league=1 para que API-Sports filtre correctamente sin dar error
-            const apiUrl = `https://v3.football.api-sports.io/fixtures?live=all&league=${WORLD_CUP_ID}`;
+            const CACHE_KEY = "api_results_cache";
+            const CACHE_TIME_KEY = "api_results_cache_time";
+            const CACHE_DURATION_MS = 60000; // 60 segundos
             
-            const responseApi = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    "x-apisports-key": API_KEY
-                }
-            });
-            const data = await responseApi.json();
+            const now = Date.now();
+            const cachedTime = sessionStorage.getItem(CACHE_TIME_KEY);
+            const cachedData = sessionStorage.getItem(CACHE_KEY);
+            
+            let data = null;
+
+            if (cachedData && cachedTime && (now - parseInt(cachedTime)) < CACHE_DURATION_MS) {
+                // Usar caché
+                data = JSON.parse(cachedData);
+            } else {
+                // Llamar a la API
+                const WORLD_CUP_ID = 1; // ID oficial de la Copa del Mundo
+                const apiUrl = `https://v3.football.api-sports.io/fixtures?live=all&league=${WORLD_CUP_ID}`;
+                
+                const responseApi = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        "x-apisports-key": API_KEY
+                    }
+                });
+                data = await responseApi.json();
+                
+                // Guardar en caché
+                sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                sessionStorage.setItem(CACHE_TIME_KEY, now.toString());
+            }
             
             // Mapeamos los partidos en directo reales
             if (data && data.response && data.response.length > 0) {
@@ -43,7 +62,6 @@ async function initEngine() {
                     status: ["FT", "AET", "PEN"].includes(match.fixture.status.short) ? "FINISHED" : "LIVE"
                 }));
             } else {
-                console.log("No hay partidos en directo ahora mismo.");
                 realResults = [];
             }
         } catch (apiError) {
@@ -290,6 +308,18 @@ function showParticipantPredictions(participantId) {
     const p = allParticipants.find(p => p.id == participantId);
     if (!p || !p.predictions || !p.predictions.matches) {
         container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No hay pronósticos disponibles.</p>';
+        return;
+    }
+
+    // BLOQUEO ANTI-SNOOP: 6 de Junio de 2026 (00:00)
+    const deadline = new Date("2026-06-06T00:00:00Z");
+    if (new Date() < deadline) {
+        container.innerHTML = `
+            <div style="background: rgba(255,0,127,0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--neon-magenta); text-align:center;">
+                <p style="color:var(--neon-magenta); font-size: 1.2rem; margin-bottom: 5px;">🔒 Pronósticos Ocultos</p>
+                <p style="color:var(--text-muted); font-size: 0.85rem;">Para evitar trampas, los pronósticos no serán públicos hasta que finalice el periodo de inscripción (6 de Junio).</p>
+            </div>
+        `;
         return;
     }
 

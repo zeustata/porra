@@ -14,67 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        :root {
-            --bg-base: #0f0c29;
-            --text-light: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.7);
-            --neon-magenta: #ff007f;
-            --neon-cyan: #00f2fe;
-            --neon-gold: #ffcf00;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-light);
-            min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.35) 0%, transparent 45%),
-                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.35) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(255, 207, 0, 0.1) 0%, transparent 60%);
-            background-attachment: fixed;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: env(safe-area-inset-top, 1rem) env(safe-area-inset-right, 1rem) env(safe-area-inset-bottom, 2rem) env(safe-area-inset-left, 1rem);
-        }
-
-        .container { 
-            width: 100%; 
-            max-width: 800px; 
-            padding: 0 1rem; 
-            margin-top: 2rem;
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        header { width: 100%; text-align: center; margin-bottom: 2rem; }
-
-        h1 { 
-            font-size: clamp(2rem, 6vw, 3rem); 
-            font-weight: 800; 
-            background: linear-gradient(135deg, var(--text-light) 0%, var(--neon-cyan) 50%, var(--neon-magenta) 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            filter: drop-shadow(0 2px 15px rgba(255,0,127,0.3)); 
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            border-left: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -125,11 +66,6 @@
             color: var(--neon-gold); 
             font-weight: 800; 
             font-size: 1.1rem;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
