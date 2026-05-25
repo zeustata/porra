@@ -157,10 +157,10 @@ function calculateScores(participants, realResults) {
         if (p.predictions.matches) {
             p.predictions.matches.forEach(pred => {
                 const real = realResults.find(r => r.matchId === pred.matchId);
-                // ¡AQUÍ ESTÁ LA MAGIA!: Calculamos puntos tanto si ha terminado como si está EN JUEGO
-                if (real && (real.status === "FINISHED" || real.status === "LIVE")) {
+                // ¡AQUÍ ESTÁ LA MAGIA!: Calculamos puntos SOLO si el partido ha terminado
+                if (real && real.status === "FINISHED") {
                     let pts = 0;
-                    // Signo (1X2) provisional o final -> 2 Puntos
+                    // Signo (1X2) final -> 2 Puntos
                     let realSign = "X", predSign = "X";
                     if (real.homeGoals > real.awayGoals) realSign = "1";
                     if (real.homeGoals < real.awayGoals) realSign = "2";
@@ -171,15 +171,11 @@ function calculateScores(participants, realResults) {
                         pts += 2;
                     }
 
-                    // Goles exactos provisionales o finales -> 1 Punto por equipo
+                    // Goles exactos finales -> 1 Punto por equipo
                     if (pred.homeGoals === real.homeGoals) pts += 1;
                     if (pred.awayGoals === real.awayGoals) pts += 1;
                     
-                    if (real.status === "LIVE") {
-                        livePoints += pts;
-                    } else {
-                        basePoints += pts;
-                    }
+                    basePoints += pts;
                 }
             });
         }
@@ -223,18 +219,14 @@ function calculateScores(participants, realResults) {
                     basePoints += getPointsForRound(predMatch.round);
                 }
 
-                // B) Goles exactos en eliminatoria (90 min) -> 10 pts provisionales o finales
-                // Condición: Solo si acertó los dos equipos que jugaban este partido
-                if (realMatch && (realMatch.status === "FINISHED" || realMatch.status === "LIVE") && 
+                // B) Goles exactos en eliminatoria (90 min) -> 10 pts finales
+                // Condición: Solo si acertó los dos equipos que jugaban este partido y ha terminado
+                if (realMatch && realMatch.status === "FINISHED" && 
                     realMatch.homeTeam === predMatch.homeTeam && 
                     realMatch.awayTeam === predMatch.awayTeam) {
                     
                     if (realMatch.homeGoals === predMatch.homeGoals && realMatch.awayGoals === predMatch.awayGoals) {
-                        if (realMatch.status === "LIVE") {
-                            livePoints += 10;
-                        } else {
-                            basePoints += 10;
-                        }
+                        basePoints += 10;
                     }
                 }
             });
