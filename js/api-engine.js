@@ -72,7 +72,12 @@ async function initEngine() {
         // 3. Calcular puntos y pintar en pantalla
         const leaderboard = calculateScores(participants, realResults);
         updateLeaderboardUI(leaderboard);
-        updateMatchesUI(realResults);
+        
+        let nextMatch = null;
+        if (realResults.length === 0) {
+            nextMatch = await fetchNextMatch();
+        }
+        updateMatchesUI(realResults, nextMatch);
         
         // 4. Cargar últimas noticias
         fetchNews();
@@ -80,6 +85,63 @@ async function initEngine() {
     } catch (error) {
         console.error("Error inicializando el motor:", error);
     }
+}
+
+// Función para obtener el próximo partido usando caché de 24 horas (Local Storage)
+async function fetchNextMatch() {
+    const CACHE_KEY = "wc_fixtures_cache_2026";
+    const CACHE_TIME_KEY = "wc_fixtures_cache_time_2026";
+    const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
+
+    const now = Date.now();
+    const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+    const cachedData = localStorage.getItem(CACHE_KEY);
+
+    let fixtures = [];
+
+    if (cachedData && cachedTime && (now - parseInt(cachedTime)) < CACHE_DURATION_MS) {
+        fixtures = JSON.parse(cachedData);
+    } else {
+        try {
+            const WORLD_CUP_ID = 1;
+            const apiUrl = `https://v3.football.api-sports.io/fixtures?league=${WORLD_CUP_ID}&season=2026`;
+            const responseApi = await fetch(apiUrl, {
+                method: 'GET',
+                headers: { "x-apisports-key": API_KEY }
+            });
+            const data = await responseApi.json();
+            
+            if (data && data.response) {
+                fixtures = data.response;
+                localStorage.setItem(CACHE_KEY, JSON.stringify(fixtures));
+                localStorage.setItem(CACHE_TIME_KEY, now.toString());
+            }
+        } catch (e) {
+            console.error("Error obteniendo calendario:", e);
+        }
+    }
+
+    if (!fixtures || fixtures.length === 0) {
+        // Fallback simulado si la API aún no devuelve datos para 2026
+        return {
+            homeTeam: "México",
+            awayTeam: "Por Definir",
+            date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
+        };
+    }
+
+    const futureMatches = fixtures.filter(m => new Date(m.fixture.date).getTime() > Date.now());
+    if (futureMatches.length > 0) {
+        futureMatches.sort((a, b) => new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime());
+        const next = futureMatches[0];
+        return {
+            homeTeam: next.teams.home.name || "Por Definir",
+            awayTeam: next.teams.away.name || "Por Definir",
+            date: new Date(next.fixture.date)
+        };
+    }
+
+    return null;
 }
 
 // Lógica matemática para calcular los puntos
@@ -240,33 +302,84 @@ function updateLeaderboardUI(leaderboard) {
     });
 }
 
-function updateMatchesUI(matches) {
+function updateMatchesUI(matches, nextMatch = null) {
     const container = document.getElementById('matches-container');
     if (!container) return;
 
+    // Limpiar intervalo anterior para que no haya relojes fantasma
+    if (window.countdownInterval) clearInterval(window.countdownInterval);
+
     container.innerHTML = '';
     
-    if (matches.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
-        return;
-    }
-    matches.forEach(m => {
+    if (matches.length > 0) {
+        matches.forEach(m => {
+            const matchDiv = document.createElement('div');
+            matchDiv.style.background = 'rgba(0,0,0,0.3)';
+            matchDiv.style.padding = '10px';
+            matchDiv.style.borderRadius = '8px';
+            matchDiv.style.marginBottom = '10px';
+            matchDiv.style.display = 'flex';
+            matchDiv.style.justifyContent = 'space-between';
+            matchDiv.style.alignItems = 'center';
+
+            matchDiv.innerHTML = `
+                <span>${m.homeTeam}</span>
+                <span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
+                <span>${m.awayTeam}</span>
+            `;
+            container.appendChild(matchDiv);
+        });
+    } else if (nextMatch) {
         const matchDiv = document.createElement('div');
         matchDiv.style.background = 'rgba(0,0,0,0.3)';
-        matchDiv.style.padding = '10px';
+        matchDiv.style.padding = '15px';
         matchDiv.style.borderRadius = '8px';
-        matchDiv.style.marginBottom = '10px';
-        matchDiv.style.display = 'flex';
-        matchDiv.style.justifyContent = 'space-between';
-        matchDiv.style.alignItems = 'center';
+        matchDiv.style.textAlign = 'center';
+        
+        // Conversión a la hora local del navegador (Península/Canarias)
+        const localTimeStr = nextMatch.date.toLocaleString('es-ES', { 
+            weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
+        });
 
         matchDiv.innerHTML = `
-            <span>${m.homeTeam}</span>
-            <span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
-            <span>${m.awayTeam}</span>
+            <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Siguiente Partido (${localTimeStr})</p>
+            <div style="display:flex; justify-content:center; align-items:center; gap: 15px; margin-bottom: 12px; font-weight: bold; font-size: 1.2rem;">
+                <span>${nextMatch.homeTeam}</span>
+                <span style="color:var(--neon-magenta); font-size: 0.9rem;">VS</span>
+                <span>${nextMatch.awayTeam}</span>
+            </div>
+            <div id="countdown-timer" style="font-family: monospace; font-size: 1.8rem; color: var(--neon-cyan); letter-spacing: 2px; text-shadow: 0 0 15px rgba(0,242,254,0.6);">
+                --:--:--:--
+            </div>
         `;
         container.appendChild(matchDiv);
-    });
+
+        const timerEl = document.getElementById('countdown-timer');
+        
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = nextMatch.date.getTime() - now;
+
+            if (distance < 0) {
+                timerEl.innerHTML = "¡PARTIDO EN JUEGO!";
+                clearInterval(window.countdownInterval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerEl.innerHTML = `${days}d ${hours.toString().padStart(2,'0')}h ${minutes.toString().padStart(2,'0')}m ${seconds.toString().padStart(2,'0')}s`;
+        }
+
+        updateTimer(); // Primera ejecución inmediata
+        window.countdownInterval = setInterval(updateTimer, 1000);
+
+    } else {
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
+    }
 }
 
 // Iniciar al cargar la página y configurar actualización automática (polling)
