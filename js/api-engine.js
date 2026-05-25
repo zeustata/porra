@@ -125,7 +125,7 @@ async function fetchNextMatch() {
         // Fallback simulado si la API aún no devuelve datos para 2026
         return {
             homeTeam: "México",
-            awayTeam: "Por Definir",
+            awayTeam: "Sudáfrica",
             date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
         };
     }
