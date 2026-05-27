@@ -235,7 +235,8 @@
         // 3. Detección iOS
         const isIos = () => {
             const userAgent = window.navigator.userAgent.toLowerCase();
-            return /iphone|ipad|ipod/.test(userAgent);
+            const isModernIpad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            return /iphone|ipad|ipod/.test(userAgent) || isModernIpad;
         };
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
