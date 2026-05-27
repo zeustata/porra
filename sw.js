@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v12';
+const CACHE_NAME = 'porra-cache-v13';
 const ASSETS = [
     './',
     './index.html',
@@ -36,12 +36,28 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Network First para HTML y CDNs externos
-    if ((url.origin === location.origin && (url.pathname === '/' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html'))) || url.origin !== location.origin) {
+    // 1. Excluir APIs externas de la caché del Service Worker (el motor de la app ya maneja su caché en localStorage)
+    if (url.hostname.includes('api.football-data.org') || url.hostname.includes('api.rss2json.com')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    // 2. Network First para archivos de código y configuración local (HTML, JS, CSS, JSON)
+    const isCriticalAsset = 
+        url.origin === location.origin && (
+            url.pathname === '/' || 
+            url.pathname.endsWith('/') || 
+            url.pathname.endsWith('.html') || 
+            url.pathname.endsWith('.js') || 
+            url.pathname.endsWith('.css') || 
+            url.pathname.endsWith('.json')
+        );
+
+    if (isCriticalAsset) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    if (response && (response.status === 200 || response.type === 'opaque')) {
+                    if (response && response.status === 200) {
                         const copy = response.clone();
                         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
                     }
@@ -50,11 +66,12 @@ self.addEventListener('fetch', (event) => {
                 .catch(() => caches.match(event.request, { ignoreSearch: true }))
         );
     } else {
-        // Cache First para el resto (imágenes, scripts, css locales)
+        // 3. Cache First con fallback de red para el resto (imágenes locales, fuentes externas)
         event.respondWith(
             caches.match(event.request, { ignoreSearch: true }).then((response) => {
                 return response || fetch(event.request).then((fetchRes) => {
-                    if (fetchRes && fetchRes.status === 200) {
+                    // Guardar en caché si es una respuesta válida o de origen externo (opaque)
+                    if (fetchRes && (fetchRes.status === 200 || fetchRes.type === 'opaque')) {
                         const copy = fetchRes.clone();
                         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
                     }

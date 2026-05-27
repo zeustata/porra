@@ -192,48 +192,28 @@
             document.body.style.overflow = '';
         }
 
-        // 1. Registrar o Desregistrar Service Worker y Purga de Caché
-        // Script de emergencia para purgar la caché defectuosa en móviles
-        window.addEventListener('load', () => {
-            let needsReload = false;
-            
-            // Purgar localStorage defectuoso
-            if (localStorage.getItem("wc_matches_cache_v4")) {
-                localStorage.removeItem("wc_matches_cache_v4");
-                localStorage.removeItem("wc_matches_cache_time_v4");
-                needsReload = true;
-            }
+        // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrado con éxito');
+                        // Forzar comprobación de actualizaciones del Service Worker
+                        registration.update();
+                    })
+                    .catch(err => console.log('Error al registrar ServiceWorker: ', err));
+            });
 
-            // Purgar cachés del Service Worker para forzar actualización
-            if ('caches' in window) {
-                caches.keys().then(names => {
-                    let hasOldCaches = false;
-                    for (let name of names) {
-                        if (name.includes('v11') || name.includes('porra-cache')) {
-                            caches.delete(name);
-                            hasOldCaches = true;
-                        }
-                    }
-                    if (hasOldCaches) {
-                        needsReload = true;
-                    }
-                });
-            }
-
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for(let registration of registrations) {
-                        registration.unregister();
-                        needsReload = true;
-                    }
-                }).then(() => {
-                    if (needsReload) {
-                        console.log("Caché purgada. Recargando...");
-                        setTimeout(() => window.location.reload(true), 1000);
-                    }
-                });
-            }
-        });
+            // Escuchar cambios de controlador (cuando un nuevo Service Worker se activa y toma el control)
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    console.log("Nuevo Service Worker activo. Recargando página...");
+                    window.location.reload();
+                }
+            });
+        }
 
         // 2. Lógica de Instalación (PWA Banner)
         let deferredPrompt;
