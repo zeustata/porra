@@ -31,7 +31,7 @@ async function initEngine() {
         try {
             const CACHE_KEY = "wc_matches_cache_v4";
             const CACHE_TIME_KEY = "wc_matches_cache_time_v4";
-            const CACHE_DURATION_MS = 1800000; // 30 minutos
+            const CACHE_DURATION_MS = 300000; // 5 minutos
             
             const now = Date.now();
             const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -637,8 +637,8 @@ function updateMatchesUI(matches, nextMatch = null) {
 window.addEventListener('DOMContentLoaded', () => {
     initEngine(); // Primera carga inmediata
     
-    // Configurar actualización en tiempo real cada 30 minutos (1800000 ms) para proteger cuota de API
-    setInterval(initEngine, 1800000);
+    // Configurar actualización en tiempo real cada 5 minutos (300000 ms) para proteger cuota de API
+    setInterval(initEngine, 300000);
 });
 
 // --- Lógica del Buscador de Pronósticos ---
