@@ -185,6 +185,7 @@ function calculateScores(participants, realResults) {
             Object.keys(p.predictions.groupStandings).forEach(groupId => {
                 const predGroup = p.predictions.groupStandings[groupId]; // ej: ["ESP", "GER", "JPN", "CRC"]
                 const realGroup = realResults.groupStandings[groupId];
+                if (!realGroup) return; // Evita crash si la API no devuelve info del grupo aún
                 
                 // Asumimos que los 2 primeros se clasifican (o los que indique la regla del torneo)
                 const realClassified = realGroup.slice(0, 2); 
@@ -481,6 +482,18 @@ async function fetchNews() {
     if (!container) return;
 
     try {
+        const CACHE_KEY = "wc_news_cache";
+        const CACHE_TIME_KEY = "wc_news_cache_time";
+        const CACHE_DURATION_MS = 3600000; // 1 hora
+        const now = Date.now();
+        const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+        const cachedData = localStorage.getItem(CACHE_KEY);
+
+        if (cachedData && cachedTime && (now - parseInt(cachedTime)) < CACHE_DURATION_MS) {
+            updateNewsUI(JSON.parse(cachedData).slice(0, 5));
+            return;
+        }
+
         // Usamos rss2json para convertir el RSS de Google News a formato JSON fácilmente procesable
         const rssUrl = encodeURIComponent('https://news.google.com/rss/search?q=Mundial+2026+futbol&hl=es&gl=ES&ceid=ES:es');
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
@@ -490,6 +503,8 @@ async function fetchNews() {
         
         const data = await response.json();
         if (data.status === 'ok' && data.items && data.items.length > 0) {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(data.items));
+            localStorage.setItem(CACHE_TIME_KEY, now.toString());
             updateNewsUI(data.items.slice(0, 5)); // Mostrar las 5 últimas noticias
         } else {
             container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">No se encontraron noticias recientes.</p>';

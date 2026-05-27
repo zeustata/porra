@@ -124,6 +124,12 @@
         <button id="pwa-dismiss-btn" style="background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-left: 10px; font-size: 0.9rem;">Ahora no</button>
     </div>
 
+    <!-- Banner de Instalación PWA (iOS) -->
+    <div id="pwa-ios-banner" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(15, 12, 41, 0.95); border: 1px solid var(--neon-cyan); border-radius: 12px; padding: 20px; z-index: 9999; backdrop-filter: blur(15px); text-align: center; box-shadow: 0 10px 30px rgba(0,242,254,0.3);">
+        <p style="margin-bottom: 15px; font-weight: 600; font-size: 1rem; color: white;">Para instalar la app en iOS: pulsa <strong style="font-size:1.2rem">⍗</strong> y luego <strong>Añadir a pantalla de inicio</strong>.</p>
+        <button id="pwa-ios-dismiss" style="background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Entendido</button>
+    </div>
+
     <!-- Visor de Medios (Modal) -->
     <div id="media-viewer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100000; flex-direction: column; align-items: center; justify-content: flex-start; padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px) 20px; backdrop-filter: blur(10px);">
         <div style="width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-top: 10px;">
@@ -225,6 +231,24 @@
         dismissBtn.addEventListener('click', () => {
             installBanner.style.display = 'none';
         });
+
+        // 3. Detección iOS
+        const isIos = () => {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            return /iphone|ipad|ipod/.test(userAgent);
+        };
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+        if (isIos() && !isInStandaloneMode()) {
+            const iosBanner = document.getElementById('pwa-ios-banner');
+            if (iosBanner) {
+                const iosDismiss = document.getElementById('pwa-ios-dismiss');
+                iosBanner.style.display = 'block';
+                iosDismiss.addEventListener('click', () => {
+                    iosBanner.style.display = 'none';
+                });
+            }
+        }
     </script>
 </body>
 </html>
