@@ -308,59 +308,15 @@ function extractAwards(matches) {
 function getMockData() {
     return {
         matches: [
-            // Fase de Grupos terminados (para testear puntos de fase de grupos)
+            // Partido inaugural simulado para la cuenta atrás
             {
                 id: 1,
-                status: "FINISHED",
-                utcDate: "2026-06-11T20:00:00Z",
-                stage: "GROUP_STAGE",
-                group: "Group A",
-                homeTeam: { name: "Mexico", tla: "MEX" },
-                awayTeam: { name: "South Africa", tla: "RSA" },
-                score: {
-                    winner: "HOME_TEAM",
-                    fullTime: { home: 2, away: 1 },
-                    regularTime: { home: 2, away: 1 }
-                }
-            },
-            {
-                id: 2,
-                status: "FINISHED",
-                utcDate: "2026-06-11T22:30:00Z",
-                stage: "GROUP_STAGE",
-                group: "Group A",
-                homeTeam: { name: "France", tla: "FRA" },
-                awayTeam: { name: "Uruguay", tla: "URU" },
-                score: {
-                    winner: "DRAW",
-                    fullTime: { home: 1, away: 1 },
-                    regularTime: { home: 1, away: 1 }
-                }
-            },
-            // Partido en juego simulado hoy
-            {
-                id: 3,
-                status: "IN_PLAY",
-                utcDate: new Date().toISOString(),
-                stage: "GROUP_STAGE",
-                group: "Group B",
-                homeTeam: { name: "Spain", tla: "ESP" },
-                awayTeam: { name: "Germany", tla: "GER" },
-                score: {
-                    winner: null,
-                    fullTime: { home: 0, away: 0 },
-                    regularTime: { home: 0, away: 0 }
-                }
-            },
-            // Partido futuro para la cuenta atrás
-            {
-                id: 4,
                 status: "SCHEDULED",
-                utcDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Dentro de 3 días
+                utcDate: "2026-06-11T20:00:00Z", // Inauguración Mundial 2026
                 stage: "GROUP_STAGE",
-                group: "Group B",
-                homeTeam: { name: "Japan", tla: "JPN" },
-                awayTeam: { name: "Costa Rica", tla: "CRC" },
+                group: "Group A",
+                homeTeam: { name: "México", tla: "MEX" },
+                awayTeam: { name: "Por Confirmar", tla: "TBD" },
                 score: {
                     winner: null,
                     fullTime: { home: null, away: null },
