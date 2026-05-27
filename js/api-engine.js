@@ -2,7 +2,7 @@
 // Motor para calcular los puntos basados en los pronósticos y los resultados reales
 
 // REGÍSTRATE GRATIS en https://www.football-data.org/client/register para obtener tu token en 10 segundos
-const API_KEY = "TU_TOKEN_DE_FOOTBALL_DATA_ORG";
+const API_KEY = "eb33115c8c4843729c576baff6e57958";
 
 // La lista de participantes se cierra el 5 de junio
 let allParticipants = [];
