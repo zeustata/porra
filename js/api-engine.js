@@ -376,8 +376,8 @@ function calculateScores(participants, realResults) {
     let leaderboard = [];
 
     participants.forEach(p => {
-        // 1. Puntos de Preguntas Especiales (hasta 100)
-        let basePoints = p.predictions.specialPoints || 0;
+        // 1. Puntos acumulados de fase de grupos y de preguntas especiales (hasta 100)
+        let basePoints = (p.predictions.groupStagePoints || 0) + (p.predictions.specialPoints || 0);
         let livePoints = 0;
 
         // 2. Partidos de Fase de Grupos
@@ -388,11 +388,17 @@ function calculateScores(participants, realResults) {
                 if (real && (real.status === "FINISHED" || real.status === "LIVE")) {
                     let pts = 0;
                     // Signo (1X2) provisional o final -> 2 Puntos
-                    let realSign = "X", predSign = "X";
+                    let realSign = "X";
                     if (real.homeGoals > real.awayGoals) realSign = "1";
-                    if (real.homeGoals < real.awayGoals) realSign = "2";
-                    if (pred.homeGoals > pred.awayGoals) predSign = "1";
-                    if (pred.homeGoals < pred.awayGoals) predSign = "2";
+                    else if (real.homeGoals < real.awayGoals) realSign = "2";
+
+                    let predSign = "X";
+                    if (pred.sign) {
+                        predSign = pred.sign;
+                    } else {
+                        if (pred.homeGoals > pred.awayGoals) predSign = "1";
+                        else if (pred.homeGoals < pred.awayGoals) predSign = "2";
+                    }
 
                     if (predSign === realSign) {
                         pts += 2;
