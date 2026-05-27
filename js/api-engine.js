@@ -6,6 +6,7 @@ const API_KEY = "eb33115c8c4843729c576baff6e57958";
 
 // La lista de participantes se cierra el 5 de junio
 let allParticipants = [];
+let globalAllMatches = [];
 
 // Función principal que inicializa el motor
 async function initEngine() {
@@ -63,37 +64,12 @@ async function initEngine() {
             if (!data && cachedData) {
                 data = JSON.parse(cachedData);
             }
-            
-            // Si no hay datos en absoluto (primer inicio sin token), cargamos los datos simulados de cortesía
-            if (!data) {
-                data = getMockData();
-            }
-
-            if (data && data.matches && data.matches.length > 0) {
-                const allMatches = data.matches;
-                
-                // Mapear partidos de fase de grupos terminados o en juego
-                realResults.matches = allMatches.filter(m => m.stage === "GROUP_STAGE").map(m => ({
-                    matchId: m.id,
-                    homeTeam: m.homeTeam.name,
-                    awayTeam: m.awayTeam.name,
-                    homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
-                    awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
-                    status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
-                }));
-                
-                // Calcular clasificaciones de grupos
-                realResults.groupStandings = calculateGroupStandings(allMatches);
-                
-                // Extraer eliminatorias
-                realResults.knockouts = extractKnockouts(allMatches);
-                
-                // Extraer campeón/3er puesto
-                realResults.finalAwards = extractAwards(allMatches);
-            }
         } catch (apiError) {
             console.error("Error conectando a la API de Football-Data:", apiError);
-            // Fallback de contingencia a la caché
+        }
+        
+        // Fallback de contingencia a la caché o datos simulados si la carga falló
+        if (!data) {
             const cachedData = localStorage.getItem("wc_matches_cache_v4");
             if (cachedData) {
                 try {
@@ -102,9 +78,34 @@ async function initEngine() {
                     console.error("Caché corrupta:", e);
                 }
             }
-            if (!data) {
-                data = getMockData();
-            }
+        }
+        if (!data) {
+            data = getMockData();
+        }
+
+        // Realizar mapeo y setup de resultados reales
+        if (data && data.matches && data.matches.length > 0) {
+            const allMatches = data.matches;
+            globalAllMatches = allMatches; // Guardar globalmente para búsquedas
+            
+            // Mapear partidos de fase de grupos terminados o en juego
+            realResults.matches = allMatches.filter(m => m.stage === "GROUP_STAGE").map(m => ({
+                matchId: m.id,
+                homeTeam: m.homeTeam.name,
+                awayTeam: m.awayTeam.name,
+                homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
+                awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
+                status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
+            }));
+            
+            // Calcular clasificaciones de grupos
+            realResults.groupStandings = calculateGroupStandings(allMatches);
+            
+            // Extraer eliminatorias
+            realResults.knockouts = extractKnockouts(allMatches);
+            
+            // Extraer campeón/3er puesto
+            realResults.finalAwards = extractAwards(allMatches);
         }
 
         // 3. Calcular puntos y pintar en pantalla
@@ -688,11 +689,26 @@ function showParticipantPredictions(participantId) {
 
     let html = '';
     p.predictions.matches.forEach(m => {
+        // Buscar el partido en el listado real global para obtener nombres si no vienen en la predicción
+        let homeName = m.homeTeam;
+        let awayName = m.awayTeam;
+        
+        if (!homeName || !awayName) {
+            const realMatch = globalAllMatches.find(r => r.id === m.matchId);
+            if (realMatch) {
+                homeName = realMatch.homeTeam.name;
+                awayName = realMatch.awayTeam.name;
+            } else {
+                homeName = `Partido ${m.matchId}`;
+                awayName = "";
+            }
+        }
+
         html += `
             <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
-                <span>${m.homeTeam}</span>
+                <span>${homeName}</span>
                 <span style="color:var(--neon-cyan); font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
-                <span>${m.awayTeam}</span>
+                <span>${awayName}</span>
             </div>
         `;
     });
