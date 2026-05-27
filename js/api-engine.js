@@ -121,15 +121,6 @@ async function fetchNextMatch() {
         }
     }
 
-    if (!fixtures || fixtures.length === 0) {
-        // Fallback simulado si la API aún no devuelve datos para 2026
-        return {
-            homeTeam: "México",
-            awayTeam: "Sudáfrica",
-            date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
-        };
-    }
-
     const futureMatches = fixtures.filter(m => new Date(m.fixture.date).getTime() > Date.now());
     if (futureMatches.length > 0) {
         futureMatches.sort((a, b) => new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime());
@@ -141,7 +132,12 @@ async function fetchNextMatch() {
         };
     }
 
-    return null;
+    // Fallback simulado si la API aún no devuelve datos futuros para 2026
+    return {
+        homeTeam: "México",
+        awayTeam: "Sudáfrica",
+        date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
+    };
 }
 
 // Lógica matemática para calcular los puntos
