@@ -62,6 +62,7 @@ h1 {
     /* Gradiente en el texto */
     background: linear-gradient(135deg, var(--text-light) 0%, var(--neon-cyan) 50%, var(--neon-magenta) 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
     letter-spacing: 2px;

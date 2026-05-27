@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v4';
+const CACHE_NAME = 'porra-cache-v5';
 const ASSETS = [
     './',
     './index.html',
@@ -37,7 +37,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     // Network First para HTML y CDNs externos
-    if ((url.origin === location.origin && (url.pathname === '/' || url.pathname.endsWith('index.html'))) || url.origin !== location.origin) {
+    if ((url.origin === location.origin && (url.pathname === '/' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html'))) || url.origin !== location.origin) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {

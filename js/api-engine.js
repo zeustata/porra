@@ -1,7 +1,8 @@
 // api-engine.js
 // Motor para calcular los puntos basados en los pronósticos y los resultados reales
 
-const API_KEY = "7588a7d31cb05d8cebc445333011ae30";
+// REGÍSTRATE GRATIS en https://www.football-data.org/client/register para obtener tu token en 10 segundos
+const API_KEY = "TU_TOKEN_DE_FOOTBALL_DATA_ORG";
 
 // La lista de participantes se cierra el 5 de junio
 let allParticipants = [];
@@ -16,68 +17,121 @@ async function initEngine() {
         allParticipants = participants;
         populateParticipantSelect(participants);
         
-        // 2. Conectar a la API real con sistema de caché (60s)
-        let realResults = [];
+        // 2. Conectar a la API real con sistema de caché en localStorage (30 minutos)
+        let realResults = {
+            matches: [],
+            groupStandings: {},
+            knockouts: [],
+            finalAwards: { champion: null, thirdPlace: null }
+        };
+        
+        let data = null;
+        
         try {
-            const CACHE_KEY = "api_results_cache";
-            const CACHE_TIME_KEY = "api_results_cache_time";
+            const CACHE_KEY = "wc_matches_cache_v4";
+            const CACHE_TIME_KEY = "wc_matches_cache_time_v4";
             const CACHE_DURATION_MS = 1800000; // 30 minutos
             
             const now = Date.now();
-            const cachedTime = sessionStorage.getItem(CACHE_TIME_KEY);
-            const cachedData = sessionStorage.getItem(CACHE_KEY);
+            const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+            const cachedData = localStorage.getItem(CACHE_KEY);
             
-            let data = null;
-
             if (cachedData && cachedTime && (now - parseInt(cachedTime)) < CACHE_DURATION_MS) {
-                // Usar caché
+                // Usar caché válida
                 data = JSON.parse(cachedData);
             } else {
-                // Llamar a la API
-                const WORLD_CUP_ID = 1; // ID oficial de la Copa del Mundo
-                const apiUrl = `https://v3.football.api-sports.io/fixtures?live=all&league=${WORLD_CUP_ID}`;
-                
-                const responseApi = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        "x-apisports-key": API_KEY
+                // Si hay un token configurado, llamamos a la API
+                if (API_KEY && API_KEY !== "TU_TOKEN_DE_FOOTBALL_DATA_ORG" && API_KEY.trim() !== "") {
+                    const apiUrl = `https://api.football-data.org/v4/competitions/WC/matches`;
+                    const responseApi = await fetch(apiUrl, {
+                        method: 'GET',
+                        headers: {
+                            "X-Auth-Token": API_KEY
+                        }
+                    });
+                    if (responseApi.ok) {
+                        data = await responseApi.json();
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        localStorage.setItem(CACHE_TIME_KEY, now.toString());
+                    } else {
+                        console.warn("La API de Football-Data devolvió un error de red o de cuota.");
                     }
-                });
-                data = await responseApi.json();
-                
-                // Guardar en caché
-                sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
-                sessionStorage.setItem(CACHE_TIME_KEY, now.toString());
+                }
             }
             
-            // Mapeamos los partidos en directo reales
-            if (data && data.response && data.response.length > 0) {
-                realResults = data.response.map(match => ({
-                    matchId: match.fixture.id,
-                    homeTeam: match.teams.home.name,
-                    awayTeam: match.teams.away.name,
-                    homeGoals: match.goals.home || 0,
-                    awayGoals: match.goals.away || 0,
-                    // Si status.short está entre estos valores, el partido ha finalizado
-                    status: ["FT", "AET", "PEN"].includes(match.fixture.status.short) ? "FINISHED" : "LIVE"
+            // Si la API falló o no hay token, pero tenemos caché vieja, la cargamos
+            if (!data && cachedData) {
+                data = JSON.parse(cachedData);
+            }
+            
+            // Si no hay datos en absoluto (primer inicio sin token), cargamos los datos simulados de cortesía
+            if (!data) {
+                data = getMockData();
+            }
+
+            if (data && data.matches && data.matches.length > 0) {
+                const allMatches = data.matches;
+                
+                // Mapear partidos de fase de grupos terminados o en juego
+                realResults.matches = allMatches.filter(m => m.stage === "GROUP_STAGE").map(m => ({
+                    matchId: m.id,
+                    homeTeam: m.homeTeam.name,
+                    awayTeam: m.awayTeam.name,
+                    homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
+                    awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
+                    status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
                 }));
-            } else {
-                realResults = [];
+                
+                // Calcular clasificaciones de grupos
+                realResults.groupStandings = calculateGroupStandings(allMatches);
+                
+                // Extraer eliminatorias
+                realResults.knockouts = extractKnockouts(allMatches);
+                
+                // Extraer campeón/3er puesto
+                realResults.finalAwards = extractAwards(allMatches);
             }
         } catch (apiError) {
-            console.error("Error conectando a la API:", apiError);
-            realResults = [];
+            console.error("Error conectando a la API de Football-Data:", apiError);
+            // Fallback de contingencia a la caché
+            const cachedData = localStorage.getItem("wc_matches_cache_v4");
+            if (cachedData) {
+                try {
+                    data = JSON.parse(cachedData);
+                } catch (e) {
+                    console.error("Caché corrupta:", e);
+                }
+            }
+            if (!data) {
+                data = getMockData();
+            }
         }
 
         // 3. Calcular puntos y pintar en pantalla
         const leaderboard = calculateScores(participants, realResults);
         updateLeaderboardUI(leaderboard);
         
+        // Obtener el próximo partido
         let nextMatch = null;
-        if (realResults.length === 0) {
-            nextMatch = await fetchNextMatch();
+        if (data && data.matches) {
+            nextMatch = getNextMatch(data.matches);
         }
-        updateMatchesUI(realResults, nextMatch);
+        
+        // Filtrar partidos de la jornada para mostrarlos (en juego o finalizados hoy)
+        const today = new Date();
+        const matchesToday = (data && data.matches) ? data.matches.filter(m => {
+            if (["IN_PLAY", "PAUSED"].includes(m.status)) return true;
+            if (m.status === "FINISHED" && isSameDay(new Date(m.utcDate), today)) return true;
+            return false;
+        }).map(m => ({
+            homeTeam: m.homeTeam.name,
+            awayTeam: m.awayTeam.name,
+            homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
+            awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
+            status: m.status === "FINISHED" ? "FINISHED" : "LIVE"
+        })) : [];
+
+        updateMatchesUI(matchesToday, nextMatch);
         
         // 4. Cargar últimas noticias
         fetchNews();
@@ -87,56 +141,232 @@ async function initEngine() {
     }
 }
 
-// Función para obtener el próximo partido usando caché de 24 horas (Local Storage)
-async function fetchNextMatch() {
-    const CACHE_KEY = "wc_fixtures_cache_2026";
-    const CACHE_TIME_KEY = "wc_fixtures_cache_time_2026";
-    const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
+// --- FUNCIONES AUXILIARES PARA EL PARSEO DE FOOTBALL-DATA.ORG ---
 
+function isSameDay(d1, d2) {
+    return d1.getFullYear() === d2.getFullYear() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getDate() === d2.getDate();
+}
+
+function getNextMatch(allMatches) {
     const now = Date.now();
-    const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
-    const cachedData = localStorage.getItem(CACHE_KEY);
-
-    let fixtures = [];
-
-    if (cachedData && cachedTime && (now - parseInt(cachedTime)) < CACHE_DURATION_MS) {
-        fixtures = JSON.parse(cachedData);
-    } else {
-        try {
-            const WORLD_CUP_ID = 1;
-            const apiUrl = `https://v3.football.api-sports.io/fixtures?league=${WORLD_CUP_ID}&season=2026`;
-            const responseApi = await fetch(apiUrl, {
-                method: 'GET',
-                headers: { "x-apisports-key": API_KEY }
-            });
-            const data = await responseApi.json();
-            
-            if (data && data.response) {
-                fixtures = data.response;
-                localStorage.setItem(CACHE_KEY, JSON.stringify(fixtures));
-                localStorage.setItem(CACHE_TIME_KEY, now.toString());
-            }
-        } catch (e) {
-            console.error("Error obteniendo calendario:", e);
-        }
-    }
-
-    const futureMatches = fixtures.filter(m => new Date(m.fixture.date).getTime() > Date.now());
+    const futureMatches = allMatches.filter(m => m.status === "SCHEDULED" && new Date(m.utcDate).getTime() > now);
+    
     if (futureMatches.length > 0) {
-        futureMatches.sort((a, b) => new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime());
+        futureMatches.sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());
         const next = futureMatches[0];
         return {
-            homeTeam: next.teams.home.name || "Por Definir",
-            awayTeam: next.teams.away.name || "Por Definir",
-            date: new Date(next.fixture.date)
+            homeTeam: next.homeTeam.name || "Por Definir",
+            awayTeam: next.awayTeam.name || "Por Definir",
+            date: new Date(next.utcDate)
         };
     }
-
-    // Fallback simulado si la API aún no devuelve datos futuros para 2026
+    
+    // Fallback simulado si no hay partidos futuros cargados
     return {
         homeTeam: "México",
         awayTeam: "Sudáfrica",
         date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
+    };
+}
+
+function calculateGroupStandings(matches) {
+    const standings = {};
+    
+    // 1. Inicializar los equipos de cada grupo
+    matches.forEach(m => {
+        if (m.stage === "GROUP_STAGE" && m.group) {
+            const groupLetter = m.group.replace("Group ", "").trim();
+            if (!standings[groupLetter]) {
+                standings[groupLetter] = {};
+            }
+            if (m.homeTeam && m.homeTeam.tla) {
+                if (!standings[groupLetter][m.homeTeam.tla]) {
+                    standings[groupLetter][m.homeTeam.tla] = { tla: m.homeTeam.tla, pts: 0, gd: 0, gf: 0 };
+                }
+            }
+            if (m.awayTeam && m.awayTeam.tla) {
+                if (!standings[groupLetter][m.awayTeam.tla]) {
+                    standings[groupLetter][m.awayTeam.tla] = { tla: m.awayTeam.tla, pts: 0, gd: 0, gf: 0 };
+                }
+            }
+        }
+    });
+
+    // 2. Acumular estadísticas de partidos finalizados
+    matches.forEach(m => {
+        if (m.stage === "GROUP_STAGE" && m.status === "FINISHED" && m.group) {
+            const groupLetter = m.group.replace("Group ", "").trim();
+            const homeTla = m.homeTeam.tla;
+            const awayTla = m.awayTeam.tla;
+            
+            const homeGoals = (m.score && m.score.fullTime) ? m.score.fullTime.home : null;
+            const awayGoals = (m.score && m.score.fullTime) ? m.score.fullTime.away : null;
+            
+            if (homeGoals !== null && awayGoals !== null && standings[groupLetter][homeTla] && standings[groupLetter][awayTla]) {
+                const home = standings[groupLetter][homeTla];
+                const away = standings[groupLetter][awayTla];
+                
+                home.gf += homeGoals;
+                home.gd += (homeGoals - awayGoals);
+                away.gf += awayGoals;
+                away.gd += (awayGoals - homeGoals);
+                
+                if (homeGoals > awayGoals) {
+                    home.pts += 3;
+                } else if (homeGoals < awayGoals) {
+                    away.pts += 3;
+                } else {
+                    home.pts += 1;
+                    away.pts += 1;
+                }
+            }
+        }
+    });
+
+    // 3. Ordenar cada grupo por criterios FIFA estándar
+    const sortedStandings = {};
+    Object.keys(standings).forEach(groupLetter => {
+        const teams = Object.values(standings[groupLetter]);
+        teams.sort((a, b) => {
+            if (b.pts !== a.pts) return b.pts - a.pts;
+            if (b.gd !== a.gd) return b.gd - a.gd;
+            return b.gf - a.gf;
+        });
+        sortedStandings[groupLetter] = teams.map(t => t.tla);
+    });
+
+    return sortedStandings;
+}
+
+function extractKnockouts(matches) {
+    const knockouts = [];
+    const stageMapping = {
+        "LAST_16": "Octavos",
+        "QUARTER_FINALS": "Cuartos",
+        "SEMI_FINALS": "Semifinales",
+        "THIRD_PLACE": "TercerPuesto",
+        "FINAL": "Final"
+    };
+
+    matches.forEach(m => {
+        if (m.stage && stageMapping[m.stage]) {
+            // Goles en los primeros 90 minutos: usamos regularTime si existe, si no fullTime
+            let homeGoals = null;
+            let awayGoals = null;
+            
+            if (m.score) {
+                if (m.score.regularTime && m.score.regularTime.home !== null) {
+                    homeGoals = m.score.regularTime.home;
+                    awayGoals = m.score.regularTime.away;
+                } else if (m.score.fullTime && m.score.fullTime.home !== null) {
+                    homeGoals = m.score.fullTime.home;
+                    awayGoals = m.score.fullTime.away;
+                }
+            }
+
+            knockouts.push({
+                matchId: m.id,
+                round: stageMapping[m.stage],
+                homeTeam: m.homeTeam ? (m.homeTeam.tla || m.homeTeam.name) : null,
+                awayTeam: m.awayTeam ? (m.awayTeam.tla || m.awayTeam.name) : null,
+                homeGoals: homeGoals,
+                awayGoals: awayGoals,
+                status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
+            });
+        }
+    });
+
+    return knockouts;
+}
+
+function extractAwards(matches) {
+    let champion = null;
+    let thirdPlace = null;
+
+    matches.forEach(m => {
+        if (m.status === "FINISHED") {
+            if (m.stage === "FINAL") {
+                const winnerTeam = m.score.winner === "HOME_TEAM" ? m.homeTeam : (m.score.winner === "AWAY_TEAM" ? m.awayTeam : null);
+                if (winnerTeam) {
+                    champion = winnerTeam.tla || winnerTeam.name;
+                }
+            } else if (m.stage === "THIRD_PLACE") {
+                const winnerTeam = m.score.winner === "HOME_TEAM" ? m.homeTeam : (m.score.winner === "AWAY_TEAM" ? m.awayTeam : null);
+                if (winnerTeam) {
+                    thirdPlace = winnerTeam.tla || winnerTeam.name;
+                }
+            }
+        }
+    });
+
+    return { champion, thirdPlace };
+}
+
+function getMockData() {
+    return {
+        matches: [
+            // Fase de Grupos terminados (para testear puntos de fase de grupos)
+            {
+                id: 1,
+                status: "FINISHED",
+                utcDate: "2026-06-11T20:00:00Z",
+                stage: "GROUP_STAGE",
+                group: "Group A",
+                homeTeam: { name: "Mexico", tla: "MEX" },
+                awayTeam: { name: "South Africa", tla: "RSA" },
+                score: {
+                    winner: "HOME_TEAM",
+                    fullTime: { home: 2, away: 1 },
+                    regularTime: { home: 2, away: 1 }
+                }
+            },
+            {
+                id: 2,
+                status: "FINISHED",
+                utcDate: "2026-06-11T22:30:00Z",
+                stage: "GROUP_STAGE",
+                group: "Group A",
+                homeTeam: { name: "France", tla: "FRA" },
+                awayTeam: { name: "Uruguay", tla: "URU" },
+                score: {
+                    winner: "DRAW",
+                    fullTime: { home: 1, away: 1 },
+                    regularTime: { home: 1, away: 1 }
+                }
+            },
+            // Partido en juego simulado hoy
+            {
+                id: 3,
+                status: "IN_PLAY",
+                utcDate: new Date().toISOString(),
+                stage: "GROUP_STAGE",
+                group: "Group B",
+                homeTeam: { name: "Spain", tla: "ESP" },
+                awayTeam: { name: "Germany", tla: "GER" },
+                score: {
+                    winner: null,
+                    fullTime: { home: 0, away: 0 },
+                    regularTime: { home: 0, away: 0 }
+                }
+            },
+            // Partido futuro para la cuenta atrás
+            {
+                id: 4,
+                status: "SCHEDULED",
+                utcDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Dentro de 3 días
+                stage: "GROUP_STAGE",
+                group: "Group B",
+                homeTeam: { name: "Japan", tla: "JPN" },
+                awayTeam: { name: "Costa Rica", tla: "CRC" },
+                score: {
+                    winner: null,
+                    fullTime: { home: null, away: null },
+                    regularTime: { home: null, away: null }
+                }
+            }
+        ]
     };
 }
 
@@ -152,7 +382,7 @@ function calculateScores(participants, realResults) {
         // 2. Partidos de Fase de Grupos
         if (p.predictions.matches) {
             p.predictions.matches.forEach(pred => {
-                const real = realResults.find(r => r.matchId === pred.matchId);
+                const real = realResults.matches ? realResults.matches.find(r => r.matchId === pred.matchId) : null;
                 // ¡AQUÍ ESTÁ LA MAGIA!: Calculamos puntos SOLO si el partido ha terminado
                 if (real && real.status === "FINISHED") {
                     let pts = 0;
