@@ -158,7 +158,7 @@
             </div>
             <div style="text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
                 <p style="color: var(--text-muted); font-size: 0.8rem;">
-                    Versión 1.0.0
+                    Versión 1.0.1
                 </p>
             </div>
         </div>
@@ -235,21 +235,25 @@
         // 3. Detección iOS
         const isIos = () => {
             const userAgent = window.navigator.userAgent.toLowerCase();
-            const isModernIpad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-            return /iphone|ipad|ipod/.test(userAgent) || isModernIpad;
+            const isIOSPlatform = /iphone|ipad|ipod/.test(userAgent);
+            const isMacWithTouch = /macintosh|mac os x/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+            return isIOSPlatform || isMacWithTouch;
         };
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
-        if (isIos() && !isInStandaloneMode()) {
-            const iosBanner = document.getElementById('pwa-ios-banner');
-            if (iosBanner) {
-                const iosDismiss = document.getElementById('pwa-ios-dismiss');
-                iosBanner.style.display = 'block';
-                iosDismiss.addEventListener('click', () => {
-                    iosBanner.style.display = 'none';
-                });
+        // Aseguramos que se ejecute una vez el DOM esté listo
+        window.addEventListener('DOMContentLoaded', () => {
+            if (isIos() && !isInStandaloneMode()) {
+                const iosBanner = document.getElementById('pwa-ios-banner');
+                if (iosBanner) {
+                    const iosDismiss = document.getElementById('pwa-ios-dismiss');
+                    iosBanner.style.display = 'block';
+                    iosDismiss.addEventListener('click', () => {
+                        iosBanner.style.display = 'none';
+                    });
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
