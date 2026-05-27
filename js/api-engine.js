@@ -29,8 +29,8 @@ async function initEngine() {
         let data = null;
         
         try {
-            const CACHE_KEY = "wc_matches_cache_v4";
-            const CACHE_TIME_KEY = "wc_matches_cache_time_v4";
+            const CACHE_KEY = "wc_matches_cache_v5";
+            const CACHE_TIME_KEY = "wc_matches_cache_time_v5";
             const CACHE_DURATION_MS = 300000; // 5 minutos
             
             const now = Date.now();
@@ -70,7 +70,7 @@ async function initEngine() {
         
         // Fallback de contingencia a la caché o datos simulados si la carga falló
         if (!data) {
-            const cachedData = localStorage.getItem("wc_matches_cache_v4");
+            const cachedData = localStorage.getItem("wc_matches_cache_v5");
             if (cachedData) {
                 try {
                     data = JSON.parse(cachedData);
@@ -152,7 +152,7 @@ function isSameDay(d1, d2) {
 
 function getNextMatch(allMatches) {
     const now = Date.now();
-    const futureMatches = allMatches.filter(m => m.status === "SCHEDULED" && new Date(m.utcDate).getTime() > now);
+    const futureMatches = allMatches.filter(m => ["SCHEDULED", "TIMED"].includes(m.status) && new Date(m.utcDate).getTime() > now);
     
     if (futureMatches.length > 0) {
         futureMatches.sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());

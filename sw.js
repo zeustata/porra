@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v11';
+const CACHE_NAME = 'porra-cache-v12';
 const ASSETS = [
     './',
     './index.html',
