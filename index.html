@@ -195,7 +195,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('sw.js?v=15')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker
