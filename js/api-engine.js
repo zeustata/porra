@@ -29,8 +29,8 @@ async function initEngine() {
         let data = null;
         
         try {
-            const CACHE_KEY = "wc_matches_cache_v5";
-            const CACHE_TIME_KEY = "wc_matches_cache_time_v5";
+            const CACHE_KEY = "wc_matches_cache_v6";
+            const CACHE_TIME_KEY = "wc_matches_cache_time_v6";
             const CACHE_DURATION_MS = 300000; // 5 minutos
             
             const now = Date.now();
@@ -70,7 +70,7 @@ async function initEngine() {
         
         // Fallback de contingencia a la caché o datos simulados si la carga falló
         if (!data) {
-            const cachedData = localStorage.getItem("wc_matches_cache_v5");
+            const cachedData = localStorage.getItem("wc_matches_cache_v6");
             if (cachedData) {
                 try {
                     data = JSON.parse(cachedData);
@@ -312,11 +312,11 @@ function getMockData() {
             {
                 id: 1,
                 status: "SCHEDULED",
-                utcDate: "2026-06-11T20:00:00Z", // Inauguración Mundial 2026
+                utcDate: "2026-06-11T19:00:00Z", // Inauguración Mundial 2026
                 stage: "GROUP_STAGE",
                 group: "Group A",
                 homeTeam: { name: "México", tla: "MEX" },
-                awayTeam: { name: "Por Confirmar", tla: "TBD" },
+                awayTeam: { name: "Sudáfrica", tla: "RSA" },
                 score: {
                     winner: null,
                     fullTime: { home: null, away: null },
