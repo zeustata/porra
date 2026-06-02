@@ -1,2 +1,794 @@
 [
+  {
+    "id": 1,
+    "name": "Lendo",
+    "predictions": {
+      "groupStagePoints": 0,
+      "specialPoints": 0,
+      "matches": [
+        {
+          "matchId": 537327,
+          "homeTeam": "Mexico",
+          "awayTeam": "South Africa",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537328,
+          "homeTeam": "South Korea",
+          "awayTeam": "Czechia",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "2"
+        },
+        {
+          "matchId": 537329,
+          "homeTeam": "Czechia",
+          "awayTeam": "South Africa",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537330,
+          "homeTeam": "Mexico",
+          "awayTeam": "South Korea",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537331,
+          "homeTeam": "Czechia",
+          "awayTeam": "Mexico",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537332,
+          "homeTeam": "South Africa",
+          "awayTeam": "South Korea",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537333,
+          "homeTeam": "Canada",
+          "awayTeam": "Bosnia-Herzegovina",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537334,
+          "homeTeam": "Qatar",
+          "awayTeam": "Switzerland",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537335,
+          "homeTeam": "Switzerland",
+          "awayTeam": "Bosnia-Herzegovina",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537336,
+          "homeTeam": "Canada",
+          "awayTeam": "Qatar",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537337,
+          "homeTeam": "Switzerland",
+          "awayTeam": "Canada",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537338,
+          "homeTeam": "Bosnia-Herzegovina",
+          "awayTeam": "Qatar",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537339,
+          "homeTeam": "Brazil",
+          "awayTeam": "Morocco",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537340,
+          "homeTeam": "Haiti",
+          "awayTeam": "Scotland",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "sign": "2"
+        },
+        {
+          "matchId": 537342,
+          "homeTeam": "Scotland",
+          "awayTeam": "Morocco",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537341,
+          "homeTeam": "Brazil",
+          "awayTeam": "Haiti",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537343,
+          "homeTeam": "Scotland",
+          "awayTeam": "Brazil",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537344,
+          "homeTeam": "Morocco",
+          "awayTeam": "Haiti",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537345,
+          "homeTeam": "United States",
+          "awayTeam": "Paraguay",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537346,
+          "homeTeam": "Australia",
+          "awayTeam": "Turkey",
+          "homeGoals": 0,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537347,
+          "homeTeam": "Turkey",
+          "awayTeam": "Paraguay",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537348,
+          "homeTeam": "United States",
+          "awayTeam": "Australia",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537349,
+          "homeTeam": "Turkey",
+          "awayTeam": "United States",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537350,
+          "homeTeam": "Paraguay",
+          "awayTeam": "Australia",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537351,
+          "homeTeam": "Germany",
+          "awayTeam": "Curaçao",
+          "homeGoals": 5,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537352,
+          "homeTeam": "Ivory Coast",
+          "awayTeam": "Ecuador",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537353,
+          "homeTeam": "Germany",
+          "awayTeam": "Ivory Coast",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537354,
+          "homeTeam": "Ecuador",
+          "awayTeam": "Curaçao",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537356,
+          "homeTeam": "Curaçao",
+          "awayTeam": "Ivory Coast",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "sign": "2"
+        },
+        {
+          "matchId": 537355,
+          "homeTeam": "Ecuador",
+          "awayTeam": "Germany",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537357,
+          "homeTeam": "Netherlands",
+          "awayTeam": "Japan",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537358,
+          "homeTeam": "Sweden",
+          "awayTeam": "Tunisia",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537360,
+          "homeTeam": "Tunisia",
+          "awayTeam": "Japan",
+          "homeGoals": 0,
+          "awayGoals": 0,
+          "sign": "2"
+        },
+        {
+          "matchId": 537359,
+          "homeTeam": "Netherlands",
+          "awayTeam": "Sweden",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537362,
+          "homeTeam": "Japan",
+          "awayTeam": "Sweden",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537361,
+          "homeTeam": "Tunisia",
+          "awayTeam": "Netherlands",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537363,
+          "homeTeam": "Belgium",
+          "awayTeam": "Egypt",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537364,
+          "homeTeam": "Iran",
+          "awayTeam": "New Zealand",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537365,
+          "homeTeam": "Belgium",
+          "awayTeam": "Iran",
+          "homeGoals": 3,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537366,
+          "homeTeam": "New Zealand",
+          "awayTeam": "Egypt",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "X"
+        },
+        {
+          "matchId": 537368,
+          "homeTeam": "Egypt",
+          "awayTeam": "Iran",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537367,
+          "homeTeam": "New Zealand",
+          "awayTeam": "Belgium",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "sign": "2"
+        },
+        {
+          "matchId": 537369,
+          "homeTeam": "Spain",
+          "awayTeam": "Cape Verde Islands",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537370,
+          "homeTeam": "Saudi Arabia",
+          "awayTeam": "Uruguay",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537371,
+          "homeTeam": "Spain",
+          "awayTeam": "Saudi Arabia",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537372,
+          "homeTeam": "Uruguay",
+          "awayTeam": "Cape Verde Islands",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537374,
+          "homeTeam": "Cape Verde Islands",
+          "awayTeam": "Saudi Arabia",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537373,
+          "homeTeam": "Uruguay",
+          "awayTeam": "Spain",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "2"
+        },
+        {
+          "matchId": 537391,
+          "homeTeam": "France",
+          "awayTeam": "Senegal",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537392,
+          "homeTeam": "Iraq",
+          "awayTeam": "Norway",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537393,
+          "homeTeam": "France",
+          "awayTeam": "Iraq",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537394,
+          "homeTeam": "Norway",
+          "awayTeam": "Senegal",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537395,
+          "homeTeam": "Norway",
+          "awayTeam": "France",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "sign": "X"
+        },
+        {
+          "matchId": 537396,
+          "homeTeam": "Senegal",
+          "awayTeam": "Iraq",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537397,
+          "homeTeam": "Argentina",
+          "awayTeam": "Algeria",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537398,
+          "homeTeam": "Austria",
+          "awayTeam": "Jordan",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537399,
+          "homeTeam": "Argentina",
+          "awayTeam": "Austria",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537400,
+          "homeTeam": "Jordan",
+          "awayTeam": "Algeria",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537402,
+          "homeTeam": "Algeria",
+          "awayTeam": "Austria",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "2"
+        },
+        {
+          "matchId": 537401,
+          "homeTeam": "Jordan",
+          "awayTeam": "Argentina",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "sign": "2"
+        },
+        {
+          "matchId": 537403,
+          "homeTeam": "Portugal",
+          "awayTeam": "Congo DR",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537404,
+          "homeTeam": "Uzbekistan",
+          "awayTeam": "Colombia",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537405,
+          "homeTeam": "Portugal",
+          "awayTeam": "Uzbekistan",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537406,
+          "homeTeam": "Colombia",
+          "awayTeam": "Congo DR",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537407,
+          "homeTeam": "Colombia",
+          "awayTeam": "Portugal",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "X"
+        },
+        {
+          "matchId": 537408,
+          "homeTeam": "Congo DR",
+          "awayTeam": "Uzbekistan",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537409,
+          "homeTeam": "England",
+          "awayTeam": "Croatia",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "sign": "X"
+        },
+        {
+          "matchId": 537410,
+          "homeTeam": "Ghana",
+          "awayTeam": "Panama",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "sign": "1"
+        },
+        {
+          "matchId": 537411,
+          "homeTeam": "England",
+          "awayTeam": "Ghana",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "sign": "1"
+        },
+        {
+          "matchId": 537412,
+          "homeTeam": "Panama",
+          "awayTeam": "Croatia",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "sign": "2"
+        },
+        {
+          "matchId": 537413,
+          "homeTeam": "Panama",
+          "awayTeam": "England",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "sign": "2"
+        },
+        {
+          "matchId": 537414,
+          "homeTeam": "Croatia",
+          "awayTeam": "Ghana",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "sign": "1"
+        }
+      ],
+      "groupStandings": {
+        "A": [
+          "MEX",
+          "CZE",
+          "KOR",
+          "RSA"
+        ],
+        "B": [
+          "SUI",
+          "CAN",
+          "BIH",
+          "QAT"
+        ],
+        "C": [
+          "BRA",
+          "MAR",
+          "SCO",
+          "HAI"
+        ],
+        "D": [
+          "USA",
+          "TUR",
+          "PAR",
+          "AUS"
+        ],
+        "E": [
+          "GER",
+          "ECU",
+          "CIV",
+          "CUR"
+        ],
+        "F": [
+          "NED",
+          "SWE",
+          "JPN",
+          "TUN"
+        ],
+        "G": [
+          "BEL",
+          "EGY",
+          "IRN",
+          "NZL"
+        ],
+        "H": [
+          "ESP",
+          "URY",
+          "KSA",
+          "CPV"
+        ],
+        "I": [
+          "FRA",
+          "NOR",
+          "SEN",
+          "IRQ"
+        ],
+        "J": [
+          "ARG",
+          "AUT",
+          "ALG",
+          "JOR"
+        ],
+        "K": [
+          "POR",
+          "COL",
+          "COD",
+          "UZB"
+        ],
+        "L": [
+          "ENG",
+          "CRO",
+          "GHA",
+          "PAN"
+        ]
+      },
+      "specialQuestionsAnswers": [
+        {
+          "question": "¿Qué selección marcará el primer gol del torneo?",
+          "answer": "México",
+          "points": 1
+        },
+        {
+          "question": "¿De qué selección será el primer amonestado del torneo?",
+          "answer": "Sudáfrica",
+          "points": 1
+        },
+        {
+          "question": "¿De qué selección será el primer expulsado del torneo?",
+          "answer": "Sudáfrica",
+          "points": 1
+        },
+        {
+          "question": "¿Qué selección lanzará el primer penalti del torneo?",
+          "answer": "México",
+          "points": 1
+        },
+        {
+          "question": "¿Ganará algún partido Cabo Verde?",
+          "answer": "No",
+          "points": 2
+        },
+        {
+          "question": "¿Se producirá algún gol en propia meta en el torneo?",
+          "answer": "Sí",
+          "points": 2
+        },
+        {
+          "question": "¿Llorará algún jugador en un partido?",
+          "answer": "Sí",
+          "points": 2
+        },
+        {
+          "question": "¿Qué selección encajará más goles en la fase de grupos?",
+          "answer": "Curazao",
+          "points": 4
+        },
+        {
+          "question": "¿Qué selección encajará menos goles en la fase de grupos?",
+          "answer": "Brasil",
+          "points": 4
+        },
+        {
+          "question": "¿Qué selección meterá más goles en la fase de grupos?",
+          "answer": "Alemania",
+          "points": 4
+        },
+        {
+          "question": "¿Qué selección meterá menos goles en la fase de grupos?",
+          "answer": "Haití",
+          "points": 4
+        },
+        {
+          "question": "¿Quién marcará el primer gol de España del torneo?",
+          "answer": "Lamine Yamal",
+          "points": 3
+        },
+        {
+          "question": "¿Qué selección le marcará el primer gol a España en la fase de grupos?",
+          "answer": "Uruguay",
+          "points": 3
+        },
+        {
+          "question": "¿Qué club tendrá el mayor número de jugadores de España en el 11 titular de su primer partido ante Cabo Verde?",
+          "answer": "FC Barcelona",
+          "points": 2
+        },
+        {
+          "question": "¿A qué jugador español le sacarán la primera tarjeta amarilla?",
+          "answer": "Gavi",
+          "points": 2
+        },
+        {
+          "question": "¿Marcará España algún gol de cabeza a lo largo del torneo?",
+          "answer": "Sí",
+          "points": 2
+        },
+        {
+          "question": "¿Conseguirá España los 9 puntos de la fase de grupos?",
+          "answer": "No",
+          "points": 2
+        },
+        {
+          "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, o más de 6?",
+          "answer": "Más de 6",
+          "points": 2
+        },
+        {
+          "question": "¿Cuántos goles encajará España en la Primer Fase: 0, 1, 2, 3, o más de 3?",
+          "answer": "1",
+          "points": 2
+        },
+        {
+          "question": "¿Llegará España alguna tanda de penaltis?",
+          "answer": "Sí",
+          "points": 2
+        },
+        {
+          "question": "¿Pasará España de Cuartos de Final?",
+          "answer": "Sí",
+          "points": 2
+        },
+        {
+          "question": "¿Quién será el pichichi español?",
+          "answer": "Lamine Yamal",
+          "points": 3
+        },
+        {
+          "question": "¿Qué selección marcará el último gol del torneo?",
+          "answer": "Francia",
+          "points": 5
+        },
+        {
+          "question": "¿Qué selección tendrá el mayor número de jugadores en el 11 ideal del torneo? (Según la FIFA)",
+          "answer": "Francia",
+          "points": 10
+        },
+        {
+          "question": "¿Quién será el máximo goleador del campeonato?",
+          "answer": "Kylian Mbappé",
+          "points": 15
+        },
+        {
+          "question": "¿Quién será el mejor jugador de la final? (MVP, según la FIFA)",
+          "answer": "Kylian Mbappé",
+          "points": 20
+        }
+      ]
+    }
+  }
 ]

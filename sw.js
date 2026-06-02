@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v15';
+const CACHE_NAME = 'porra-cache-v18';
 const ASSETS = [
     './',
     './index.html',
@@ -34,6 +34,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    // Ignorar esquemas no soportados (como extensiones de Chrome)
+    if (!event.request.url.startsWith('http')) return;
+
     const url = new URL(event.request.url);
 
     // 1. Excluir APIs externas de la caché del Service Worker (el motor de la app ya maneja su caché en localStorage)

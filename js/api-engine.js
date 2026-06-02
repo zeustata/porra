@@ -174,13 +174,15 @@ function getNextMatch(allMatches) {
 
 function calculateGroupStandings(matches) {
     const standings = {};
+    const finishedCount = {};
     
     // 1. Inicializar los equipos de cada grupo
     matches.forEach(m => {
         if (m.stage === "GROUP_STAGE" && m.group) {
-            const groupLetter = m.group.replace("Group ", "").trim();
+            const groupLetter = m.group.replace("Group ", "").replace("GROUP_", "").trim();
             if (!standings[groupLetter]) {
                 standings[groupLetter] = {};
+                finishedCount[groupLetter] = 0;
             }
             if (m.homeTeam && m.homeTeam.tla) {
                 if (!standings[groupLetter][m.homeTeam.tla]) {
@@ -198,7 +200,7 @@ function calculateGroupStandings(matches) {
     // 2. Acumular estadísticas de partidos finalizados
     matches.forEach(m => {
         if (m.stage === "GROUP_STAGE" && m.status === "FINISHED" && m.group) {
-            const groupLetter = m.group.replace("Group ", "").trim();
+            const groupLetter = m.group.replace("Group ", "").replace("GROUP_", "").trim();
             const homeTla = m.homeTeam.tla;
             const awayTla = m.awayTeam.tla;
             
@@ -206,6 +208,7 @@ function calculateGroupStandings(matches) {
             const awayGoals = (m.score && m.score.fullTime) ? m.score.fullTime.away : null;
             
             if (homeGoals !== null && awayGoals !== null && standings[groupLetter][homeTla] && standings[groupLetter][awayTla]) {
+                finishedCount[groupLetter]++;
                 const home = standings[groupLetter][homeTla];
                 const away = standings[groupLetter][awayTla];
                 
@@ -229,6 +232,10 @@ function calculateGroupStandings(matches) {
     // 3. Ordenar cada grupo por criterios FIFA estándar
     const sortedStandings = {};
     Object.keys(standings).forEach(groupLetter => {
+        // Solo calculamos clasificación real si se ha jugado al menos un partido en el grupo
+        if (!finishedCount[groupLetter] || finishedCount[groupLetter] === 0) {
+            return;
+        }
         const teams = Object.values(standings[groupLetter]);
         teams.sort((a, b) => {
             if (b.pts !== a.pts) return b.pts - a.pts;
