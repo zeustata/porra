@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v18';
+const CACHE_NAME = 'porra-cache-v19';
 const ASSETS = [
     './',
     './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
     './manifest.json',
     './js/api-engine.js?v=1.1',
     './data/participants.json',
+    './data/official_answers.json',
     './reglas.html'
 ];
 

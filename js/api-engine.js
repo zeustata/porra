@@ -18,6 +18,17 @@ async function initEngine() {
         allParticipants = participants;
         populateParticipantSelect(participants);
         
+        // 1.5 Cargar Respuestas Oficiales
+        let officialAnswers = [];
+        try {
+            const responseOff = await fetch('data/official_answers.json?v=19');
+            if (responseOff.ok) {
+                officialAnswers = await responseOff.json();
+            }
+        } catch(e) {
+            console.warn("No se pudo cargar official_answers.json");
+        }
+
         // 2. Conectar a la API real con sistema de caché en localStorage (30 minutos)
         let realResults = {
             matches: [],
@@ -109,7 +120,7 @@ async function initEngine() {
         }
 
         // 3. Calcular puntos y pintar en pantalla
-        const leaderboard = calculateScores(participants, realResults);
+        const leaderboard = calculateScores(participants, realResults, officialAnswers);
         updateLeaderboardUI(leaderboard);
         
         // Obtener el próximo partido
@@ -335,12 +346,32 @@ function getMockData() {
 }
 
 // Lógica matemática para calcular los puntos
-function calculateScores(participants, realResults) {
+function calculateScores(participants, realResults, officialAnswers = []) {
     let leaderboard = [];
 
     participants.forEach(p => {
         // 1. Puntos acumulados de fase de grupos y de preguntas especiales (hasta 100)
-        let basePoints = (p.predictions.groupStagePoints || 0) + (p.predictions.specialPoints || 0);
+        let specialPts = 0;
+        
+        if (p.predictions.specialQuestionsAnswers && officialAnswers.length > 0) {
+            p.predictions.specialQuestionsAnswers.forEach(pAnswer => {
+                const off = officialAnswers.find(o => o.question === pAnswer.question);
+                if (off && off.answer !== null && off.answer !== "") {
+                    // Normalizar respuestas a minúsculas para evitar fallos tontos (ej: "México" vs "méxico")
+                    const ans1 = pAnswer.answer.toString().trim().toLowerCase();
+                    const ans2 = off.answer.toString().trim().toLowerCase();
+                    if (ans1 === ans2) {
+                        specialPts += off.points;
+                    }
+                }
+            });
+        }
+        
+        // Sumar también los puntos manuales por si acaso, y guardar para la UI
+        specialPts += (p.predictions.specialPoints || 0);
+        p.calculatedSpecialPoints = specialPts;
+        
+        let basePoints = (p.predictions.groupStagePoints || 0) + specialPts;
         let livePoints = 0;
 
         // 2. Partidos de Fase de Grupos
@@ -692,7 +723,8 @@ function showParticipantPredictions(participantId) {
         `;
     });
     
-    html += `<div style="text-align:center; margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Puntos especiales: ${p.predictions.specialPoints || 0}</div>`;
+    let specialDisplay = p.calculatedSpecialPoints !== undefined ? p.calculatedSpecialPoints : (p.predictions.specialPoints || 0);
+    html += `<div style="text-align:center; margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Puntos especiales: ${specialDisplay}</div>`;
 
     container.innerHTML = html;
 }
