@@ -28,15 +28,41 @@
     </header>
 
     <div class="container">
-        <!-- Tarjeta Principal (Clasificación) -->
+        <!-- Tarjeta Clasificación Fase de Grupos -->
         <div class="glass-card main-card">
-            <h2>🏆 Clasificación General</h2>
+            <h2>🏆 Clasificación Fase de Grupos</h2>
             <div class="leaderboard">
-                <div id="leaderboard-list" style="display:flex; flex-direction:column;">
+                <div id="leaderboard-grupos" style="display:flex; flex-direction:column;">
                     <p style="text-align:center; color:var(--text-muted);">Cargando clasificación en tiempo real...</p>
                 </div>
             </div>
-            <button id="btn-ver-completa" onclick="toggleLeaderboard()" style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; display: none;">Ver Completa</button>
+            <button id="btn-ver-completa-grupos" onclick="toggleGruposLeaderboard()" style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; display: none;">Ver Completa</button>
+        </div>
+
+        <!-- Tarjeta Clasificación Preguntas -->
+        <div class="glass-card">
+            <h2>🧠 Clasificación Preguntas</h2>
+            <div class="leaderboard">
+                <div id="leaderboard-preguntas" style="display:flex; flex-direction:column;">
+                    <p style="text-align:center; color:var(--text-muted);">Cargando clasificación de preguntas...</p>
+                </div>
+            </div>
+            <button id="btn-ver-completa-preguntas" onclick="togglePreguntasLeaderboard()" style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; display: none;">Ver Completa</button>
+        </div>
+
+        <!-- Tarjeta Clasificación Fase Final (Bloqueada) -->
+        <div class="glass-card locked-card" style="position: relative; overflow: hidden; opacity: 0.65; min-height: 180px;">
+            <div style="position: absolute; top: 18px; right: 20px; font-size: 1.3rem;">🔒</div>
+            <h2>⚔️ Clasificación Fase Final</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-magenta); text-transform: uppercase; letter-spacing: 1px; margin-top: -8px; font-weight: bold; margin-bottom: 1rem;">Próximamente</p>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; filter: blur(2.5px); user-select: none; pointer-events: none;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span>1. Lendo</span> <span><strong>0 pts</strong></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span>2. Invitado</span> <span><strong>0 pts</strong></span>
+                </div>
+            </div>
         </div>
 
         <div class="glass-card">

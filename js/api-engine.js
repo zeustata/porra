@@ -120,8 +120,9 @@ async function initEngine() {
         }
 
         // 3. Calcular puntos y pintar en pantalla
-        const leaderboard = calculateScores(participants, realResults, officialAnswers);
-        updateLeaderboardUI(leaderboard);
+        const result = calculateScores(participants, realResults, officialAnswers);
+        updateGruposLeaderboardUI(result.groups);
+        updatePreguntasLeaderboardUI(result.questions);
         
         // Obtener el próximo partido
         let nextMatch = null;
@@ -347,10 +348,11 @@ function getMockData() {
 
 // Lógica matemática para calcular los puntos
 function calculateScores(participants, realResults, officialAnswers = []) {
-    let leaderboard = [];
+    let groupsLeaderboard = [];
+    let questionsLeaderboard = [];
 
     participants.forEach(p => {
-        // 1. Puntos acumulados de fase de grupos y de preguntas especiales (hasta 100)
+        // --- 1. CLASIFICACIÓN PREGUNTAS ESPECIALES ---
         let specialPts = 0;
         
         if (p.predictions.specialQuestionsAnswers && officialAnswers.length > 0) {
@@ -371,10 +373,18 @@ function calculateScores(participants, realResults, officialAnswers = []) {
         specialPts += (p.predictions.specialPoints || 0);
         p.calculatedSpecialPoints = specialPts;
         
-        let basePoints = (p.predictions.groupStagePoints || 0) + specialPts;
+        questionsLeaderboard.push({
+            name: p.name,
+            points: specialPts,
+            basePoints: specialPts,
+            livePoints: 0
+        });
+
+        // --- 2. CLASIFICACIÓN FASE DE GRUPOS ---
+        let basePoints = (p.predictions.groupStagePoints || 0);
         let livePoints = 0;
 
-        // 2. Partidos de Fase de Grupos
+        // Partidos de Fase de Grupos
         if (p.predictions.matches) {
             p.predictions.matches.forEach(pred => {
                 const real = realResults.matches ? realResults.matches.find(r => r.matchId === pred.matchId) : null;
@@ -411,7 +421,7 @@ function calculateScores(participants, realResults, officialAnswers = []) {
             });
         }
 
-        // 3. Clasificación de Grupos (Ejemplo de estructura futura)
+        // Clasificación de Grupos (Standings)
         if (p.predictions.groupStandings && realResults.groupStandings) {
             Object.keys(p.predictions.groupStandings).forEach(groupId => {
                 const predGroup = p.predictions.groupStandings[groupId]; // ej: ["ESP", "GER", "JPN", "CRC"]
@@ -436,51 +446,23 @@ function calculateScores(participants, realResults, officialAnswers = []) {
             });
         }
 
-        // 4. Fase Eliminatoria (Cruces y Goles)
-        if (p.predictions.knockouts && realResults.knockouts) {
-            // Ejemplo iterando sobre los partidos eliminatorios
-            p.predictions.knockouts.forEach(predMatch => {
-                const realMatch = realResults.knockouts.find(r => r.matchId === predMatch.matchId);
-                
-                // A) Acierto de equipos que llegan a este cruce
-                // Si el pronóstico dice que España llega a la Final, y en la realidad España llega a la Final
-                if (realMatch && realMatch.homeTeam === predMatch.homeTeam) {
-                    basePoints += getPointsForRound(predMatch.round); 
-                }
-                if (realMatch && realMatch.awayTeam === predMatch.awayTeam) {
-                    basePoints += getPointsForRound(predMatch.round);
-                }
-
-                // B) Goles exactos en eliminatoria (90 min) -> 10 pts provisionales o finales
-                // Condición: Solo si acertó los dos equipos que jugaban este partido y ha terminado o está en juego
-                if (realMatch && (realMatch.status === "FINISHED" || realMatch.status === "LIVE") && 
-                    realMatch.homeTeam === predMatch.homeTeam && 
-                    realMatch.awayTeam === predMatch.awayTeam) {
-                    
-                    if (realMatch.homeGoals === predMatch.homeGoals && realMatch.awayGoals === predMatch.awayGoals) {
-                        if (realMatch.status === "LIVE") {
-                            livePoints += 10;
-                        } else {
-                            basePoints += 10;
-                        }
-                    }
-                }
-            });
-        }
-
-        // 5. Premios Finales
-        if (p.predictions.finalAwards && realResults.finalAwards) {
-            if (p.predictions.finalAwards.champion === realResults.finalAwards.champion) basePoints += 50;
-            if (p.predictions.finalAwards.thirdPlace === realResults.finalAwards.thirdPlace) basePoints += 25;
-        }
-        
-        let totalPoints = basePoints + livePoints;
-        leaderboard.push({ name: p.name, points: totalPoints, basePoints: basePoints, livePoints: livePoints });
+        let totalGroupPoints = basePoints + livePoints;
+        groupsLeaderboard.push({
+            name: p.name,
+            points: totalGroupPoints,
+            basePoints: basePoints,
+            livePoints: livePoints
+        });
     });
 
     // Ordenar de mayor a menor
-    leaderboard.sort((a, b) => b.points - a.points);
-    return leaderboard;
+    groupsLeaderboard.sort((a, b) => b.points - a.points);
+    questionsLeaderboard.sort((a, b) => b.points - a.points);
+    
+    return {
+        groups: groupsLeaderboard,
+        questions: questionsLeaderboard
+    };
 }
 
 function getPointsForRound(roundName) {
@@ -496,19 +478,25 @@ function getPointsForRound(roundName) {
 }
 
 // Variables globales para el estado de la tabla
-let showFullLeaderboard = false;
-let lastLeaderboard = [];
+let showFullGrupos = false;
+let lastGruposLeaderboard = [];
+let showFullPreguntas = false;
+let lastPreguntasLeaderboard = [];
 
-window.toggleLeaderboard = function() {
-    showFullLeaderboard = !showFullLeaderboard;
-    updateLeaderboardUI(lastLeaderboard);
+window.toggleGruposLeaderboard = function() {
+    showFullGrupos = !showFullGrupos;
+    updateGruposLeaderboardUI(lastGruposLeaderboard);
 };
 
-// Actualizar el DOM
-function updateLeaderboardUI(leaderboard) {
-    lastLeaderboard = leaderboard;
-    const list = document.getElementById('leaderboard-list');
-    const btnVerCompleta = document.getElementById('btn-ver-completa');
+window.togglePreguntasLeaderboard = function() {
+    showFullPreguntas = !showFullPreguntas;
+    updatePreguntasLeaderboardUI(lastPreguntasLeaderboard);
+};
+
+// Función auxiliar genérica para renderizar una lista de clasificación
+function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuestions = false) {
+    const list = document.getElementById(elementId);
+    const btnVerCompleta = document.getElementById(btnId);
     if (!list) return;
 
     list.innerHTML = '';
@@ -519,12 +507,12 @@ function updateLeaderboardUI(leaderboard) {
         return;
     }
     
-    let itemsToShow = showFullLeaderboard ? leaderboard : leaderboard.slice(0, 5);
+    let itemsToShow = showFull ? leaderboard : leaderboard.slice(0, 5);
     
     if (leaderboard.length > 5) {
         if (btnVerCompleta) {
             btnVerCompleta.style.display = 'block';
-            btnVerCompleta.innerText = showFullLeaderboard ? 'Ver Menos' : 'Ver Completa';
+            btnVerCompleta.innerText = showFull ? 'Ver Menos' : 'Ver Completa';
         }
     } else {
         if (btnVerCompleta) btnVerCompleta.style.display = 'none';
@@ -544,16 +532,29 @@ function updateLeaderboardUI(leaderboard) {
         else if (index === 2) medal = '🥉 ';
         else medal = `${index + 1}. `;
 
-        let pointsHtml = `<strong style="color:var(--neon-cyan)">${p.basePoints} pts</strong>`;
+        let pointsHtml = ``;
         let nameStyle = '';
-        if (p.livePoints > 0) {
+        
+        if (!isQuestions && p.livePoints > 0) {
             pointsHtml = `<strong style="color:var(--neon-cyan)">${p.basePoints}</strong> <strong style="color:var(--neon-gold); font-size: 0.9em; animation: pulse 1.5s infinite;">+${p.livePoints} live 🔴</strong>`;
             nameStyle = 'color: var(--neon-gold); font-weight: 600; text-shadow: 0 0 8px rgba(255,207,0,0.2);';
+        } else {
+            pointsHtml = `<strong style="color:var(--neon-cyan)">${p.points} pts</strong>`;
         }
 
         item.innerHTML = `<span style="${nameStyle}">${medal}${p.name}</span> <span>${pointsHtml}</span>`;
         list.appendChild(item);
     });
+}
+
+function updateGruposLeaderboardUI(leaderboard) {
+    lastGruposLeaderboard = leaderboard;
+    renderLeaderboardList('leaderboard-grupos', 'btn-ver-completa-grupos', leaderboard, showFullGrupos, false);
+}
+
+function updatePreguntasLeaderboardUI(leaderboard) {
+    lastPreguntasLeaderboard = leaderboard;
+    renderLeaderboardList('leaderboard-preguntas', 'btn-ver-completa-preguntas', leaderboard, showFullPreguntas, true);
 }
 
 function updateMatchesUI(matches, nextMatch = null) {
