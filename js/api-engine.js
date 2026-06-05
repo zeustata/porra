@@ -21,7 +21,7 @@ async function initEngine() {
         // 1.5 Cargar Respuestas Oficiales
         let officialAnswers = [];
         try {
-            const responseOff = await fetch('data/official_answers.json?v=19');
+            const responseOff = await fetch('data/official_answers.json?v=20');
             if (responseOff.ok) {
                 officialAnswers = await responseOff.json();
             }
