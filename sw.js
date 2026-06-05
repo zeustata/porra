@@ -5,7 +5,7 @@ const ASSETS = [
     './css/style.css',
     './logo.png',
     './manifest.json',
-    './js/api-engine.js?v=1.1',
+    './js/api-engine.js?v=20',
     './data/participants.json',
     './data/official_answers.json',
     './reglas.html'
