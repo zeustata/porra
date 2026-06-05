@@ -471,8 +471,7 @@ function getPointsForRound(roundName) {
         case 'Cuartos': return 10;
         case 'Semifinales': return 15;
         case 'TercerPuesto': return 25;
-        case 'Final': return 20;
-        case 'Finalista': return 30; // Si se gestiona como premio separado
+        case 'Final': return 30;
         default: return 0;
     }
 }

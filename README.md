@@ -20,9 +20,8 @@ Un sistema modular y escalable para gestionar "porras" o predicciones de torneos
 - **Clasificados a Octavos:** 5 puntos por acierto.
 - **Clasificados a Cuartos:** 10 puntos por acierto.
 - **Clasificados a Semifinales:** 15 puntos por acierto.
-- **Clasificados a la Final:** 20 puntos por acierto.
-- **3er y 4º Puesto:** 25 puntos por acierto.
-- **Finalista:** 30 puntos por acierto.
+- **Clasificados para el tercer y cuarto puesto:** 25 puntos por acierto.
+- **Clasificados para la Final:** 30 puntos por acierto.
 *Nota: Puntos de esta fase supeditados a los cruces pronosticados.*
 
 ### 4. Premios Finales y Preguntas
