@@ -713,13 +713,13 @@ function showParticipantPredictions(participantId) {
             <button class="pred-tab-btn" onclick="switchPredictionsTab(this, 'groups')" style="flex: 1; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px 4px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; outline: none; font-family: inherit;">📊 Grupos</button>
             <button class="pred-tab-btn" onclick="switchPredictionsTab(this, 'questions')" style="flex: 1; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px 4px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; outline: none; font-family: inherit;">🧠 Preguntas</button>
         </div>
-        <div id="pred-tab-content-matches" class="pred-tab-content-pane" style="display: block; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+        <div id="pred-tab-content-matches" class="pred-tab-content-pane" style="display: block; max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;">
             <!-- Matches list -->
         </div>
-        <div id="pred-tab-content-groups" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+        <div id="pred-tab-content-groups" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;">
             <!-- Groups -->
         </div>
-        <div id="pred-tab-content-questions" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+        <div id="pred-tab-content-questions" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;">
             <!-- Special questions -->
         </div>
         <style>
