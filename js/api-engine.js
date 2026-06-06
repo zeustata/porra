@@ -777,7 +777,7 @@ function showParticipantPredictions(participantId) {
             matchesHtml += `
                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: right; padding-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${homeName}</span>
+                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: right; padding-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${homeName}</span>
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 70px;">
                             <span style="color: var(--neon-cyan); font-weight: 800; font-size: 0.95rem;">
                                 ${m.homeGoals} - ${m.awayGoals}
@@ -786,7 +786,7 @@ function showParticipantPredictions(participantId) {
                                 Signo: ${m.sign}
                             </span>
                         </div>
-                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: left; padding-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${awayName}</span>
+                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: left; padding-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${awayName}</span>
                     </div>
                     ${realResultHtml}
                 </div>
@@ -879,7 +879,7 @@ function showParticipantPredictions(participantId) {
                 <div style="${rowStyle} padding: 8px; border-radius: 8px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 3px; text-align: left;">
                     <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${qAns.question}</span>
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; gap: 8px;">
-                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">Apuesta: <strong style="color: var(--neon-cyan);">${qAns.answer}</strong></span>
+                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0;">Apuesta: <strong style="color: var(--neon-cyan);">${qAns.answer}</strong></span>
                         ${statusHtml}
                     </div>
                 </div>
