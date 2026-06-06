@@ -7,6 +7,13 @@ const API_KEY = "eb33115c8c4843729c576baff6e57958";
 // La lista de participantes se cierra el 5 de junio
 let allParticipants = [];
 let globalAllMatches = [];
+let globalOfficialAnswers = [];
+let globalRealResults = {
+    matches: [],
+    groupStandings: {},
+    knockouts: [],
+    finalAwards: { champion: null, thirdPlace: null }
+};
 
 // Función principal que inicializa el motor
 async function initEngine() {
@@ -120,6 +127,8 @@ async function initEngine() {
         }
 
         // 3. Calcular puntos y pintar en pantalla
+        globalRealResults = realResults;
+        globalOfficialAnswers = officialAnswers;
         const result = calculateScores(participants, realResults, officialAnswers);
         updateGruposLeaderboardUI(result.groups);
         updatePreguntasLeaderboardUI(result.questions);
@@ -680,7 +689,7 @@ function showParticipantPredictions(participantId) {
     }
 
     const p = allParticipants.find(p => p.id == participantId);
-    if (!p || !p.predictions || !p.predictions.matches) {
+    if (!p || !p.predictions) {
         container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No hay pronósticos disponibles.</p>';
         return;
     }
@@ -697,37 +706,224 @@ function showParticipantPredictions(participantId) {
         return;
     }
 
-    let html = '';
-    p.predictions.matches.forEach(m => {
-        // Buscar el partido en el listado real global para obtener nombres si no vienen en la predicción
-        let homeName = m.homeTeam;
-        let awayName = m.awayTeam;
-        
-        if (!homeName || !awayName) {
-            const realMatch = globalAllMatches.find(r => r.id === m.matchId);
-            if (realMatch) {
-                homeName = realMatch.homeTeam.name;
-                awayName = realMatch.awayTeam.name;
-            } else {
-                homeName = `Partido ${m.matchId}`;
-                awayName = "";
+    // Render Tab Buttons and Tab Content Areas
+    container.innerHTML = `
+        <div class="predictions-tabs" style="display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+            <button class="pred-tab-btn active" onclick="switchPredictionsTab(this, 'matches')" style="flex: 1; background: rgba(0, 242, 254, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 4px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; outline: none; font-family: inherit;">⚽ Partidos</button>
+            <button class="pred-tab-btn" onclick="switchPredictionsTab(this, 'groups')" style="flex: 1; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px 4px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; outline: none; font-family: inherit;">📊 Grupos</button>
+            <button class="pred-tab-btn" onclick="switchPredictionsTab(this, 'questions')" style="flex: 1; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 8px 4px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; outline: none; font-family: inherit;">🧠 Preguntas</button>
+        </div>
+        <div id="pred-tab-content-matches" class="pred-tab-content-pane" style="display: block; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+            <!-- Matches list -->
+        </div>
+        <div id="pred-tab-content-groups" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+            <!-- Groups -->
+        </div>
+        <div id="pred-tab-content-questions" class="pred-tab-content-pane" style="display: none; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+            <!-- Special questions -->
+        </div>
+        <style>
+            .pred-tab-content-pane::-webkit-scrollbar { width: 4px; }
+            .pred-tab-content-pane::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+            .pred-tab-content-pane::-webkit-scrollbar-thumb { background: rgba(0,242,254,0.2); border-radius: 4px; }
+        </style>
+    `;
+
+    // 1. Matches and Quiniela Tab Content
+    const matchesPane = document.getElementById('pred-tab-content-matches');
+    if (p.predictions.matches && p.predictions.matches.length > 0) {
+        let matchesHtml = '';
+        p.predictions.matches.forEach(m => {
+            let homeName = m.homeTeam;
+            let awayName = m.awayTeam;
+            
+            if (!homeName || !awayName) {
+                const realMatch = globalAllMatches.find(r => r.id === m.matchId);
+                if (realMatch) {
+                    homeName = realMatch.homeTeam.name;
+                    awayName = realMatch.awayTeam.name;
+                } else {
+                    homeName = `Partido ${m.matchId}`;
+                    awayName = "";
+                }
             }
-        }
 
-        html += `
-            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
-                <span>${homeName}</span>
-                <span style="color:var(--neon-cyan); font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>
-                <span>${awayName}</span>
-            </div>
-        `;
-    });
-    
-    let specialDisplay = p.calculatedSpecialPoints !== undefined ? p.calculatedSpecialPoints : (p.predictions.specialPoints || 0);
-    html += `<div style="text-align:center; margin-top:10px; font-size:0.85rem; color:var(--text-muted);">Puntos especiales: ${specialDisplay}</div>`;
+            const realMatch = globalAllMatches.find(r => r.id === m.matchId);
+            let realResultHtml = '';
+            if (realMatch && (realMatch.status === "FINISHED" || realMatch.status === "LIVE" || ["IN_PLAY", "PAUSED"].includes(realMatch.status))) {
+                const homeGoalsReal = (realMatch.score && realMatch.score.fullTime && realMatch.score.fullTime.home !== null) ? realMatch.score.fullTime.home : 0;
+                const awayGoalsReal = (realMatch.score && realMatch.score.fullTime && realMatch.score.fullTime.away !== null) ? realMatch.score.fullTime.away : 0;
+                const statusLabel = realMatch.status === "FINISHED" ? "Final" : "En Juego 🔴";
+                const statusColor = realMatch.status === "FINISHED" ? "var(--text-muted)" : "var(--neon-gold)";
+                
+                // Calcular puntos
+                let matchPts = 0;
+                let realSign = "X";
+                if (homeGoalsReal > awayGoalsReal) realSign = "1";
+                else if (homeGoalsReal < awayGoalsReal) realSign = "2";
+                
+                if (m.sign === realSign) matchPts += 2;
+                if (m.homeGoals === homeGoalsReal) matchPts += 1;
+                if (m.awayGoals === awayGoalsReal) matchPts += 1;
+                
+                realResultHtml = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.07); font-size: 0.75rem;">
+                        <span style="color: ${statusColor}; font-weight: 500;">Real: ${homeGoalsReal} - ${awayGoalsReal} (${statusLabel})</span>
+                        <span style="color: var(--neon-gold); font-weight: bold;">+${matchPts} pts</span>
+                    </div>
+                `;
+            }
 
-    container.innerHTML = html;
+            matchesHtml += `
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: right; padding-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${homeName}</span>
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 70px;">
+                            <span style="color: var(--neon-cyan); font-weight: 800; font-size: 0.95rem;">
+                                ${m.homeGoals} - ${m.awayGoals}
+                            </span>
+                            <span style="background: rgba(0,242,254,0.1); border: 1px solid rgba(0,242,254,0.3); color: var(--neon-cyan); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">
+                                Signo: ${m.sign}
+                            </span>
+                        </div>
+                        <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: left; padding-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${awayName}</span>
+                    </div>
+                    ${realResultHtml}
+                </div>
+            `;
+        });
+        matchesPane.innerHTML = matchesHtml;
+    } else {
+        matchesPane.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0; font-size: 0.85rem;">No hay pronósticos de partidos.</p>';
+    }
+
+    // 2. Groups Tab Content
+    const groupsPane = document.getElementById('pred-tab-content-groups');
+    if (p.predictions.groupStandings) {
+        let groupsHtml = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 2px;">';
+        
+        Object.keys(p.predictions.groupStandings).forEach(groupId => {
+            const predGroup = p.predictions.groupStandings[groupId];
+            const realGroup = globalRealResults.groupStandings ? globalRealResults.groupStandings[groupId] : null;
+            
+            groupsHtml += `
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; display: flex; flex-direction: column;">
+                    <h4 style="color: var(--neon-cyan); border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px; margin-bottom: 6px; font-size: 0.8rem; text-align: center; font-weight: bold;">Grupo ${groupId}</h4>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
+            `;
+            
+            predGroup.forEach((team, idx) => {
+                let statusIcon = '';
+                let teamColor = 'var(--text-light)';
+                
+                if (realGroup && realGroup.length > 0) {
+                    const isClassifiedReal = realGroup.slice(0, 2).includes(team);
+                    const isClassifiedPred = idx < 2;
+                    const exactPos = realGroup[idx] === team;
+                    
+                    let ptSum = 0;
+                    if (isClassifiedPred && isClassifiedReal) ptSum += 5;
+                    if (exactPos) ptSum += 3;
+                    
+                    if (ptSum > 0) {
+                        teamColor = 'var(--neon-gold)';
+                        statusIcon = ` <span style="color: var(--neon-gold); font-size: 0.7rem;">✔ (+${ptSum})</span>`;
+                    } else {
+                        statusIcon = ` <span style="color: rgba(255,255,255,0.3); font-size: 0.7rem;">(0)</span>`;
+                    }
+                }
+                
+                groupsHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; color: ${teamColor};">
+                        <span>${idx + 1}. ${team}</span>
+                        <span>${statusIcon}</span>
+                    </div>
+                `;
+            });
+            
+            groupsHtml += `
+                    </div>
+                </div>
+            `;
+        });
+        groupsHtml += '</div>';
+        groupsPane.innerHTML = groupsHtml;
+    } else {
+        groupsPane.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0; font-size: 0.85rem;">No hay pronósticos de clasificaciones de grupos.</p>';
+    }
+
+    // 3. Questions Tab Content
+    const questionsPane = document.getElementById('pred-tab-content-questions');
+    if (p.predictions.specialQuestionsAnswers && p.predictions.specialQuestionsAnswers.length > 0) {
+        let questionsHtml = '';
+        p.predictions.specialQuestionsAnswers.forEach(qAns => {
+            const off = globalOfficialAnswers.find(o => o.question === qAns.question);
+            let statusHtml = '';
+            let rowStyle = 'background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);';
+            
+            if (off && off.answer !== null && off.answer !== "") {
+                const ans1 = qAns.answer.toString().trim().toLowerCase();
+                const ans2 = off.answer.toString().trim().toLowerCase();
+                if (ans1 === ans2) {
+                    statusHtml = `<span style="color: var(--neon-gold); font-weight: bold; font-size: 0.75rem;">✔ +${off.points} pts</span>`;
+                    rowStyle = 'background: rgba(255, 207, 0, 0.05); border: 1px solid rgba(255, 207, 0, 0.2);';
+                } else {
+                    statusHtml = `<span style="color: var(--neon-magenta); font-weight: 500; font-size: 0.75rem;">❌ (Oficial: ${off.answer})</span>`;
+                    rowStyle = 'background: rgba(255, 0, 127, 0.03); border: 1px solid rgba(255, 0, 127, 0.1);';
+                }
+            } else {
+                statusHtml = `<span style="color: var(--text-muted); font-size: 0.75rem;">⏳ Pendiente (${qAns.points || (off ? off.points : 0)} pts)</span>`;
+            }
+            
+            questionsHtml += `
+                <div style="${rowStyle} padding: 8px; border-radius: 8px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 3px; text-align: left;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${qAns.question}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; gap: 8px;">
+                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">Apuesta: <strong style="color: var(--neon-cyan);">${qAns.answer}</strong></span>
+                        ${statusHtml}
+                    </div>
+                </div>
+            `;
+        });
+        
+        let specialDisplay = p.calculatedSpecialPoints !== undefined ? p.calculatedSpecialPoints : (p.predictions.specialPoints || 0);
+        questionsHtml += `<div style="text-align:center; margin-top:8px; font-size:0.75rem; color:var(--text-muted);">Puntos especiales totales: ${specialDisplay}</div>`;
+        
+        questionsPane.innerHTML = questionsHtml;
+    } else {
+        questionsPane.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0; font-size: 0.85rem;">No hay pronósticos de preguntas especiales.</p>';
+    }
 }
+
+// Lógica de pestañas de pronósticos
+window.switchPredictionsTab = function(btnElement, tabName) {
+    const tabContainer = btnElement.parentNode;
+    const buttons = tabContainer.querySelectorAll('.pred-tab-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'transparent';
+        btn.style.borderColor = 'transparent';
+        btn.style.color = 'var(--text-muted)';
+        btn.style.fontWeight = '600';
+    });
+
+    btnElement.classList.add('active');
+    btnElement.style.background = 'rgba(0, 242, 254, 0.15)';
+    btnElement.style.borderColor = 'var(--neon-cyan)';
+    btnElement.style.color = 'var(--neon-cyan)';
+    btnElement.style.fontWeight = 'bold';
+
+    const cardBody = tabContainer.parentNode;
+    const panes = cardBody.querySelectorAll('.pred-tab-content-pane');
+    panes.forEach(pane => {
+        pane.style.display = 'none';
+    });
+
+    const targetPane = cardBody.querySelector(`#pred-tab-content-${tabName}`);
+    if (targetPane) {
+        targetPane.style.display = 'block';
+    }
+};
 
 // --- Lógica de Noticias RSS ---
 async function fetchNews() {
