@@ -681,7 +681,7 @@
         {
           "question": "¿Ganará algún partido Cabo Verde?",
           "answer": "No",
-          "points": 2
+          "points": 1
         },
         {
           "question": "¿Se producirá algún gol en propia meta en el torneo?",
@@ -689,7 +689,7 @@
           "points": 2
         },
         {
-          "question": "¿Llorará algún jugador en un partido?",
+          "question": "¿Logrará algún jugador un hat-trick?",
           "answer": "Sí",
           "points": 2
         },
@@ -719,7 +719,7 @@
           "points": 3
         },
         {
-          "question": "¿Qué selección le marcará el primer gol a España en la fase de grupos?",
+          "question": "¿Qué selección le marcará el primer gol a España en la fase de grupos? Cabo Verde (16Jun), Arabia Saudí (21Jun), Uruguay (27Jun)",
           "answer": "Uruguay",
           "points": 3
         },
@@ -744,17 +744,17 @@
           "points": 2
         },
         {
-          "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, o más de 6?",
+          "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, ó más de 6?",
           "answer": "Más de 6",
           "points": 2
         },
         {
-          "question": "¿Cuántos goles encajará España en la Primer Fase: 0, 1, 2, 3, o más de 3?",
-          "answer": "1",
+          "question": "¿Cuántos goles encajará España en la Primer Fase: 0-1, 2-3, ó más de 3?",
+          "answer": "0-1",
           "points": 2
         },
         {
-          "question": "¿Llegará España alguna tanda de penaltis?",
+          "question": "¿Jugará España alguna tanda de penaltis?",
           "answer": "Sí",
           "points": 2
         },
@@ -769,12 +769,12 @@
           "points": 3
         },
         {
-          "question": "¿Qué selección marcará el último gol del torneo?",
+          "question": "¿Qué selección marcará el último gol del torneo? (No cuenta la tanda de penaltis; sí la posible prórroga)",
           "answer": "Francia",
           "points": 5
         },
         {
-          "question": "¿Qué selección tendrá el mayor número de jugadores en el 11 ideal del torneo? (Según la FIFA)",
+          "question": "¿Qué selección tendrá el mayor número de jugadores en el 11 ideal del torneo ? (Según la FIFA)",
           "answer": "Francia",
           "points": 10
         },
