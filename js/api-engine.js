@@ -263,7 +263,7 @@ function calculateGroupStandings(matches) {
             if (b.gd !== a.gd) return b.gd - a.gd;
             return b.gf - a.gf;
         });
-        sortedStandings[groupLetter] = teams.map(t => t.tla);
+        sortedStandings[groupLetter] = teams;
     });
 
     return sortedStandings;
@@ -360,6 +360,29 @@ function calculateScores(participants, realResults, officialAnswers = []) {
     let groupsLeaderboard = [];
     let questionsLeaderboard = [];
 
+    // --- 0. PRE-CALCULAR CLASIFICADOS DE FASE DE GRUPOS ---
+    let globalClassifiedTlas = [];
+    if (realResults.groupStandings && Object.keys(realResults.groupStandings).length > 0) {
+        let allThirds = [];
+        Object.keys(realResults.groupStandings).forEach(groupId => {
+            const groupTeams = realResults.groupStandings[groupId];
+            if (groupTeams.length > 0) {
+                globalClassifiedTlas.push(groupTeams[0].tla); // 1º
+                if (groupTeams.length > 1) globalClassifiedTlas.push(groupTeams[1].tla); // 2º
+                if (groupTeams.length > 2) allThirds.push(groupTeams[2]); // 3º
+            }
+        });
+        // Ordenar los terceros (FIFA: pts > gd > gf)
+        allThirds.sort((a, b) => {
+            if (b.pts !== a.pts) return b.pts - a.pts;
+            if (b.gd !== a.gd) return b.gd - a.gd;
+            return b.gf - a.gf;
+        });
+        // Sumar los 8 mejores terceros a la lista global
+        const best8Thirds = allThirds.slice(0, 8);
+        best8Thirds.forEach(t => globalClassifiedTlas.push(t.tla));
+    }
+
     participants.forEach(p => {
         // --- 1. CLASIFICACIÓN PREGUNTAS ESPECIALES ---
         let specialPts = 0;
@@ -430,37 +453,39 @@ function calculateScores(participants, realResults, officialAnswers = []) {
             });
         }
 
+        let groupPoints = 0;
+
         // Clasificación de Grupos (Standings)
         if (p.predictions.groupStandings && realResults.groupStandings) {
             Object.keys(p.predictions.groupStandings).forEach(groupId => {
                 const predGroup = p.predictions.groupStandings[groupId]; // ej: ["ESP", "GER", "JPN", "CRC"]
                 const realGroup = realResults.groupStandings[groupId];
-                if (!realGroup) return; // Evita crash si la API no devuelve info del grupo aún
+                if (!realGroup || realGroup.length === 0) return; 
                 
-                // Asumimos que los 2 primeros se clasifican (o los que indique la regla del torneo)
-                const realClassified = realGroup.slice(0, 2); 
-                const predClassified = predGroup.slice(0, 2);
+                // Se apuesta que clasifican los que pones 1º, 2º y 3º
+                const predClassified = predGroup.slice(0, 3);
 
                 predClassified.forEach(team => {
-                    if (realClassified.includes(team)) {
-                        basePoints += 5; // Acertó que el equipo se clasifica
+                    if (globalClassifiedTlas.includes(team)) {
+                        groupPoints += 5; // Acertó que el equipo se clasifica
                     }
                 });
 
                 predGroup.forEach((team, index) => {
-                    if (realGroup[index] === team) {
-                        basePoints += 3; // Acertó la posición exacta en el grupo
+                    if (realGroup[index] && realGroup[index].tla === team) {
+                        groupPoints += 3; // Acertó la posición exacta en el grupo
                     }
                 });
             });
         }
 
-        let totalGroupPoints = basePoints + livePoints;
+        let totalGroupPoints = basePoints + livePoints + groupPoints;
         groupsLeaderboard.push({
             name: p.name,
             points: totalGroupPoints,
             basePoints: basePoints,
-            livePoints: livePoints
+            livePoints: livePoints,
+            groupPoints: groupPoints
         });
     });
 
@@ -543,9 +568,29 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
         let pointsHtml = ``;
         let nameStyle = '';
         
-        if (!isQuestions && p.livePoints > 0) {
-            pointsHtml = `<strong style="color:var(--neon-cyan)">${p.basePoints}</strong> <strong style="color:var(--neon-gold); font-size: 0.9em; animation: pulse 1.5s infinite;">+${p.livePoints} live 🔴</strong>`;
-            nameStyle = 'color: var(--neon-gold); font-weight: 600; text-shadow: 0 0 8px rgba(255,207,0,0.2);';
+        if (!isQuestions) {
+            pointsHtml = `<div style="text-align: right;">`;
+            pointsHtml += `<div style="font-weight: bold; color: var(--text-light); font-size: 1.1rem;">${p.points} pts</div>`;
+            pointsHtml += `<div style="font-size: 0.75rem; display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px;">`;
+            
+            // Puntos de base (partidos finalizados)
+            pointsHtml += `<span style="color:var(--text-muted)" title="Puntos definitivos de partidos finalizados">${p.basePoints} base</span>`;
+            
+            // Puntos live (rojo)
+            if (p.livePoints > 0) {
+                pointsHtml += `<span style="color:var(--neon-gold); animation: pulse 1.5s infinite;" title="Puntos provisionales de partidos en juego">+${p.livePoints} live 🔴</span>`;
+            }
+            
+            // Puntos provisionales de grupos (morado)
+            if (p.groupPoints > 0) {
+                pointsHtml += `<span style="color:var(--neon-magenta);" title="Puntos provisionales por clasificación de grupo">+${p.groupPoints} prov 📊</span>`;
+            }
+            
+            pointsHtml += `</div></div>`;
+            
+            if (p.livePoints > 0) {
+                nameStyle = 'color: var(--neon-gold); font-weight: 600; text-shadow: 0 0 8px rgba(255,207,0,0.2);';
+            }
         } else {
             pointsHtml = `<strong style="color:var(--neon-cyan)">${p.points} pts</strong>`;
         }
