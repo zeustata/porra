@@ -19,7 +19,7 @@ let globalRealResults = {
 async function initEngine() {
     try {
         // 1. Cargar pronósticos de los participantes
-        const responsePart = await fetch('data/participants.json');
+        const responsePart = await fetch('data/participants.json?v=25');
         if (!responsePart.ok) throw new Error('No se pudo cargar participants.json');
         const participants = await responsePart.json();
         allParticipants = participants;

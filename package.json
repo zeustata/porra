@@ -1,0 +1,24 @@
+{
+  "name": "porras",
+  "version": "1.0.0",
+  "description": "Un sistema modular y escalable para gestionar \"porras\" o predicciones de torneos deportivos (ej. Mundial 2026). El sistema está diseñado para que el \"motor\" de cálculo de puntos sea genérico y permita añadir diferentes sistemas de puntuación o reglas para futuros torneos.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeustata/porra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zeustata/porra/issues"
+  },
+  "homepage": "https://github.com/zeustata/porra#readme",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  }
+}
