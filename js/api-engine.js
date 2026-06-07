@@ -14,6 +14,7 @@ let globalRealResults = {
     knockouts: [],
     finalAwards: { champion: null, thirdPlace: null }
 };
+let globalClassifiedTlasList = [];
 
 // Función principal que inicializa el motor
 async function initEngine() {
@@ -382,6 +383,7 @@ function calculateScores(participants, realResults, officialAnswers = []) {
         const best8Thirds = allThirds.slice(0, 8);
         best8Thirds.forEach(t => globalClassifiedTlas.push(t.tla));
     }
+    globalClassifiedTlasList = globalClassifiedTlas;
 
     participants.forEach(p => {
         // --- 1. CLASIFICACIÓN PREGUNTAS ESPECIALES ---
@@ -862,9 +864,9 @@ function showParticipantPredictions(participantId) {
                 let teamColor = 'var(--text-light)';
                 
                 if (realGroup && realGroup.length > 0) {
-                    const isClassifiedReal = realGroup.slice(0, 2).includes(team);
-                    const isClassifiedPred = idx < 2;
-                    const exactPos = realGroup[idx] === team;
+                    const isClassifiedReal = globalClassifiedTlasList.includes(team);
+                    const isClassifiedPred = idx < 3;
+                    const exactPos = realGroup[idx] && realGroup[idx].tla === team;
                     
                     let ptSum = 0;
                     if (isClassifiedPred && isClassifiedReal) ptSum += 5;
