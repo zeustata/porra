@@ -621,36 +621,49 @@ function updateMatchesUI(matches, nextMatch = null) {
 
     container.innerHTML = '';
     
-    if (matches.length > 0) {
-        matches.forEach(m => {
-            const matchDiv = document.createElement('div');
-            matchDiv.style.background = 'rgba(0,0,0,0.3)';
-            matchDiv.style.padding = '10px';
-            matchDiv.style.borderRadius = '8px';
-            matchDiv.style.marginBottom = '10px';
-            matchDiv.style.display = 'flex';
-            matchDiv.style.justifyContent = 'space-between';
-            matchDiv.style.alignItems = 'center';
+    // Asegurar que el contenedor tenga scroll si hay muchos partidos
+    container.style.maxHeight = '400px';
+    container.style.overflowY = 'auto';
+    container.style.paddingRight = '5px';
+    container.classList.add('custom-scrollbar'); // Añadir clase genérica si existe, o usar inline
 
-            let middleContent = '';
-            if (m.status === "LIVE") {
-                middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN JUEGO</span>`;
-            } else {
-                middleContent = `<span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>`;
-            }
+    const liveMatches = matches.filter(m => m.status === "LIVE");
+    const finishedMatches = matches.filter(m => m.status === "FINISHED");
 
-            matchDiv.innerHTML = `
-                <span style="flex:1; text-align:right;">${m.homeTeam}</span>
-                <div style="flex:1; display:flex; justify-content:center;">${middleContent}</div>
-                <span style="flex:1; text-align:left;">${m.awayTeam}</span>
-            `;
-            container.appendChild(matchDiv);
-        });
+    // Función auxiliar para crear la fila de un partido
+    const createMatchRow = (m) => {
+        const matchDiv = document.createElement('div');
+        matchDiv.style.background = 'rgba(0,0,0,0.3)';
+        matchDiv.style.padding = '10px';
+        matchDiv.style.borderRadius = '8px';
+        matchDiv.style.marginBottom = '10px';
+        matchDiv.style.display = 'flex';
+        matchDiv.style.justifyContent = 'space-between';
+        matchDiv.style.alignItems = 'center';
+
+        let middleContent = '';
+        if (m.status === "LIVE") {
+            middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN JUEGO</span>`;
+        } else {
+            middleContent = `<span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>`;
+        }
+
+        matchDiv.innerHTML = `
+            <span style="flex:1; text-align:right;">${m.homeTeam}</span>
+            <div style="flex:1; display:flex; justify-content:center;">${middleContent}</div>
+            <span style="flex:1; text-align:left;">${m.awayTeam}</span>
+        `;
+        return matchDiv;
+    };
+
+    // 1. Renderizar Partidos EN JUEGO (Arriba del todo)
+    if (liveMatches.length > 0) {
+        liveMatches.forEach(m => container.appendChild(createMatchRow(m)));
     }
     
+    // 2. Renderizar PRÓXIMO PARTIDO (Cuenta atrás en el medio)
     if (nextMatch) {
-        // Añadimos un separador sutil si ya hay partidos mostrándose arriba
-        if (matches.length > 0) {
+        if (liveMatches.length > 0) {
             const separator = document.createElement('div');
             separator.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
             separator.style.margin = '15px 0';
@@ -662,8 +675,8 @@ function updateMatchesUI(matches, nextMatch = null) {
         matchDiv.style.padding = '15px';
         matchDiv.style.borderRadius = '8px';
         matchDiv.style.textAlign = 'center';
+        matchDiv.style.marginBottom = '10px';
         
-        // Conversión a la hora local del navegador (Península/Canarias)
         const localTimeStr = nextMatch.date.toLocaleString('es-ES', { 
             weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
         });
@@ -706,6 +719,17 @@ function updateMatchesUI(matches, nextMatch = null) {
 
     }
     
+    // 3. Renderizar Partidos FINALIZADOS (Abajo del todo)
+    if (finishedMatches.length > 0) {
+        if (liveMatches.length > 0 || nextMatch) {
+            const separator = document.createElement('div');
+            separator.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
+            separator.style.margin = '15px 0';
+            container.appendChild(separator);
+        }
+        finishedMatches.forEach(m => container.appendChild(createMatchRow(m)));
+    }
+
     if (matches.length === 0 && !nextMatch) {
         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
     }
