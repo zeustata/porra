@@ -646,7 +646,17 @@ function updateMatchesUI(matches, nextMatch = null) {
             `;
             container.appendChild(matchDiv);
         });
-    } else if (nextMatch) {
+    }
+    
+    if (nextMatch) {
+        // Añadimos un separador sutil si ya hay partidos mostrándose arriba
+        if (matches.length > 0) {
+            const separator = document.createElement('div');
+            separator.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
+            separator.style.margin = '15px 0';
+            container.appendChild(separator);
+        }
+
         const matchDiv = document.createElement('div');
         matchDiv.style.background = 'rgba(0,0,0,0.3)';
         matchDiv.style.padding = '15px';
@@ -694,7 +704,9 @@ function updateMatchesUI(matches, nextMatch = null) {
         updateTimer(); // Primera ejecución inmediata
         window.countdownInterval = setInterval(updateTimer, 1000);
 
-    } else {
+    }
+    
+    if (matches.length === 0 && !nextMatch) {
         container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
     }
 }
