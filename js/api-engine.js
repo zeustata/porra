@@ -19,8 +19,12 @@ let globalClassifiedTlasList = [];
 // Función principal que inicializa el motor
 async function initEngine() {
     try {
+        // Obtener la versión dinámica de la caché desde el script actual para no tener que cambiarlo a mano
+        const scriptTag = document.querySelector('script[src*="api-engine.js"]');
+        const cacheVer = scriptTag && scriptTag.src.includes('?v=') ? scriptTag.src.split('?v=')[1] : Date.now();
+
         // 1. Cargar pronósticos de los participantes
-        const responsePart = await fetch('data/participants.json?v=25');
+        const responsePart = await fetch(`data/participants.json?v=${cacheVer}`);
         if (!responsePart.ok) throw new Error('No se pudo cargar participants.json');
         const participants = await responsePart.json();
         allParticipants = participants;
@@ -29,7 +33,7 @@ async function initEngine() {
         // 1.5 Cargar Respuestas Oficiales
         let officialAnswers = [];
         try {
-            const responseOff = await fetch('data/official_answers.json?v=20');
+            const responseOff = await fetch(`data/official_answers.json?v=${cacheVer}`);
             if (responseOff.ok) {
                 officialAnswers = await responseOff.json();
             }
