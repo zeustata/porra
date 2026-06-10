@@ -1071,3 +1071,67 @@ function updateNewsUI(articles) {
 
     container.innerHTML = html;
 }
+
+// --- LOGICA DE ADMINISTRADOR ---
+window.toggleAdminState = function() {
+    const locked = document.getElementById('admin-locked-state');
+    const unlocked = document.getElementById('admin-unlocked-state');
+    if (unlocked.style.display === 'flex') {
+        unlocked.style.display = 'none';
+        locked.style.display = 'flex';
+        document.getElementById('admin-lock-icon').textContent = '🔒';
+    }
+};
+
+window.unlockAdmin = function() {
+    const pwd = document.getElementById('admin-pwd-input').value;
+    const error = document.getElementById('admin-error-msg');
+    if (pwd === 'LodeYPrincesa') {
+        error.style.display = 'none';
+        document.getElementById('admin-locked-state').style.display = 'none';
+        document.getElementById('admin-unlocked-state').style.display = 'flex';
+        document.getElementById('admin-lock-icon').textContent = '🔓';
+        renderAdminQuestions();
+    } else {
+        error.style.display = 'block';
+    }
+};
+
+function renderAdminQuestions() {
+    const container = document.getElementById('admin-questions-container');
+    if (!container) return;
+    let html = '';
+    if (typeof globalOfficialAnswers !== 'undefined' && globalOfficialAnswers) {
+        globalOfficialAnswers.forEach((q, idx) => {
+            const val = q.answer || '';
+            html += `
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px;">${q.question} <span style="color:var(--neon-gold)">(${q.points} pts)</span></p>
+                    <input type="text" class="admin-q-input" data-idx="${idx}" value="${val}" style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--neon-cyan); outline: none;">
+                </div>
+            `;
+        });
+    }
+    container.innerHTML = html;
+}
+
+window.downloadOfficialAnswers = function() {
+    const inputs = document.querySelectorAll('.admin-q-input');
+    if (!globalOfficialAnswers || globalOfficialAnswers.length === 0) return;
+    let newAnswers = JSON.parse(JSON.stringify(globalOfficialAnswers));
+    
+    inputs.forEach(input => {
+        const idx = input.getAttribute('data-idx');
+        newAnswers[idx].answer = input.value.trim() === '' ? null : input.value.trim();
+    });
+    
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(newAnswers, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute('href', dataStr);
+    downloadAnchorNode.setAttribute('download', 'official_answers.json');
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    
+    alert('Archivo official_answers.json descargado. ¡Reemplázalo en tu carpeta data/ y súbelo a GitHub!');
+};

@@ -17,7 +17,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="css/style.css?v=32">
+    <link rel="stylesheet" href="css/style.css?v=33">
 </head>
 <body>
 
@@ -158,6 +158,38 @@
                 .news-date { font-size: 0.75rem; color: var(--neon-cyan); font-weight: 400; }
             </style>
         </div>
+
+        <!-- Tarjeta Administrador (Protegida) -->
+        <div class="glass-card expandable-card" id="admin-card" style="border-color: rgba(255,0,127,0.3);">
+            <h2 onclick="toggleAdminState()"><span class="icon" id="admin-lock-icon">🔒</span> Zona de Administración</h2>
+            
+            <!-- Estado Bloqueado -->
+            <div id="admin-locked-state" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">Introduce la contraseña maestra para editar resultados.</p>
+                <div style="display: flex; gap: 8px;">
+                    <input type="password" id="admin-pwd-input" placeholder="Contraseña..." style="flex: 1; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.5); color: var(--text-light); border: 1px solid var(--neon-magenta); outline: none;">
+                    <button onclick="unlockAdmin()" style="background: var(--neon-magenta); color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;">Entrar</button>
+                </div>
+                <p id="admin-error-msg" style="color: red; font-size: 0.8rem; text-align: center; display: none;">Contraseña incorrecta</p>
+            </div>
+
+            <!-- Estado Desbloqueado -->
+            <div id="admin-unlocked-state" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <p style="font-size: 0.85rem; color: var(--neon-cyan); text-align: center; font-weight: bold;">Respuestas Oficiales Actuales</p>
+                <div id="admin-questions-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Se rellena por JS -->
+                </div>
+                <button onclick="downloadOfficialAnswers()" style="background: var(--neon-cyan); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px;">📥 Descargar JSON Actualizado</button>
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: -5px;">Descarga el archivo y sustitúyelo en la carpeta data/</p>
+            </div>
+            
+            <style>
+                #admin-questions-container::-webkit-scrollbar { width: 4px; }
+                #admin-questions-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+                #admin-questions-container::-webkit-scrollbar-thumb { background: rgba(255,0,127,0.4); border-radius: 4px; }
+            </style>
+        </div>
+
     </div>
 
     <!-- Footer -->
@@ -216,7 +248,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api-engine.js?v=32"></script>
+    <script src="js/api-engine.js?v=33"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -246,7 +278,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=32')
+                navigator.serviceWorker.register('sw.js?v=33')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker
