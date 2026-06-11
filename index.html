@@ -17,7 +17,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="css/style.css?v=44">
+    <link rel="stylesheet" href="css/style.css?v=45">
 </head>
 <body>
 
@@ -248,7 +248,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api-engine.js?v=44"></script>
+    <script src="js/api-engine.js?v=45"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -278,7 +278,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=44')
+                navigator.serviceWorker.register('sw.js?v=45')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker

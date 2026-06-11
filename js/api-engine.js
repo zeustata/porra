@@ -108,6 +108,16 @@ async function initEngine() {
 
         // Realizar mapeo y setup de resultados reales
         if (data && data.matches && data.matches.length > 0) {
+            // --- EMERGENCY OVERRIDE ---
+            data.matches.forEach(m => {
+                if (m.homeTeam && (m.homeTeam.name === "Mexico" || m.homeTeam.name === "México")) {
+                    if (!m.score) m.score = {};
+                    if (!m.score.fullTime) m.score.fullTime = {};
+                    m.score.fullTime.home = 0;
+                    m.score.fullTime.away = 1;
+                }
+            });
+            // --------------------------
             const allMatches = data.matches;
             globalAllMatches = allMatches; // Guardar globalmente para búsquedas
             
