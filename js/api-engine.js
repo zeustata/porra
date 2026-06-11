@@ -118,7 +118,7 @@ async function initEngine() {
                 awayTeam: m.awayTeam.name,
                 homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
                 awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
-                status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
+                status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) ? "LIVE" : "SCHEDULED")
             }));
             
             // Calcular clasificaciones de grupos
@@ -144,18 +144,20 @@ async function initEngine() {
             nextMatch = getNextMatch(data.matches);
         }
         
-        // Filtrar partidos de la jornada para mostrarlos (en juego o finalizados hoy)
+        // Filtrar partidos de la jornada para mostrarlos (en juego, finalizados u otros programados hoy)
         const today = new Date();
         const matchesToday = (data && data.matches) ? data.matches.filter(m => {
-            if (["IN_PLAY", "PAUSED"].includes(m.status)) return true;
-            if (m.status === "FINISHED" && isSameDay(new Date(m.utcDate), today)) return true;
+            if (["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) return true;
+            if (isSameDay(new Date(m.utcDate), today)) return true;
             return false;
         }).map(m => ({
+            id: m.id,
             homeTeam: m.homeTeam.name,
             awayTeam: m.awayTeam.name,
             homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
             awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
-            status: m.status === "FINISHED" ? "FINISHED" : "LIVE"
+            status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) ? "LIVE" : "SCHEDULED"),
+            date: new Date(m.utcDate)
         })) : [];
 
         updateMatchesUI(matchesToday, nextMatch);
@@ -178,24 +180,30 @@ function isSameDay(d1, d2) {
 
 function getNextMatch(allMatches) {
     const now = Date.now();
-    const futureMatches = allMatches.filter(m => ["SCHEDULED", "TIMED"].includes(m.status) && new Date(m.utcDate).getTime() > now);
+    const futureMatches = allMatches.filter(m => ["SCHEDULED", "TIMED"].includes(m.status) && new Date(m.utcDate).getTime() > now && m.homeTeam.name !== "Mexico" && m.homeTeam.name !== "México");
     
     if (futureMatches.length > 0) {
         futureMatches.sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime());
         const next = futureMatches[0];
         return {
+            id: next.id,
             homeTeam: next.homeTeam.name || "Por Definir",
             awayTeam: next.awayTeam.name || "Por Definir",
             date: new Date(next.utcDate)
         };
     }
     
-    // Fallback simulado si no hay partidos futuros cargados
-    return {
-        homeTeam: "México",
-        awayTeam: "Sudáfrica",
-        date: new Date("2026-06-11T20:00:00Z") // UTC: 20:00 -> España: 22:00
-    };
+    // Fallback simulado si no hay partidos futuros cargados (solo válido durante la inauguración)
+    const fallbackDate = new Date("2026-06-11T19:00:00Z");
+    if (Date.now() < fallbackDate.getTime() + (3 * 60 * 60 * 1000)) { // Expira a las 22:00 UTC (00:00 España)
+        return {
+            id: 1,
+            homeTeam: "México",
+            awayTeam: "Sudáfrica",
+            date: fallbackDate
+        };
+    }
+    return null;
 }
 
 function calculateGroupStandings(matches) {
@@ -307,7 +315,7 @@ function extractKnockouts(matches) {
                 awayTeam: m.awayTeam ? (m.awayTeam.tla || m.awayTeam.name) : null,
                 homeGoals: homeGoals,
                 awayGoals: awayGoals,
-                status: m.status === "FINISHED" ? "FINISHED" : (["IN_PLAY", "PAUSED"].includes(m.status) ? "LIVE" : "SCHEDULED")
+                status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || (m.homeTeam && (m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))))) ? "LIVE" : "SCHEDULED")
             });
         }
     });
@@ -577,7 +585,7 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
         if (!isQuestions) {
             pointsHtml = `<div style="text-align: right;">`;
             pointsHtml += `<div style="font-weight: bold; color: var(--text-light); font-size: 1.1rem;">${p.points} pts</div>`;
-            pointsHtml += `<div style="font-size: 0.75rem; display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px;">`;
+            pointsHtml += `<div style="font-size: 0.75rem; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 2px;">`;
             
             // Puntos de base (partidos finalizados)
             pointsHtml += `<span style="color:var(--text-muted)" title="Puntos definitivos de partidos finalizados">${p.basePoints} base</span>`;
@@ -601,7 +609,7 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
             pointsHtml = `<strong style="color:var(--neon-cyan)">${p.points} pts</strong>`;
         }
 
-        item.innerHTML = `<span style="${nameStyle}">${medal}${p.name}</span> <span>${pointsHtml}</span>`;
+        item.innerHTML = `<span style="${nameStyle}; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">${medal}${p.name}</span> <div>${pointsHtml}</div>`;
         list.appendChild(item);
     });
 }
@@ -629,10 +637,11 @@ function updateMatchesUI(matches, nextMatch = null) {
     container.style.maxHeight = '400px';
     container.style.overflowY = 'auto';
     container.style.paddingRight = '5px';
-    container.classList.add('custom-scrollbar'); // Añadir clase genérica si existe, o usar inline
+    container.classList.add('custom-scrollbar'); 
 
     const liveMatches = matches.filter(m => m.status === "LIVE");
     const finishedMatches = matches.filter(m => m.status === "FINISHED");
+    const scheduledMatches = matches.filter(m => m.status === "SCHEDULED" && (!nextMatch || m.id !== nextMatch.id));
 
     // Función auxiliar para crear la fila de un partido
     const createMatchRow = (m) => {
@@ -647,15 +656,25 @@ function updateMatchesUI(matches, nextMatch = null) {
 
         let middleContent = '';
         if (m.status === "LIVE") {
-            middleContent = `<span style="background:var(--neon-gold); padding:5px 15px; border-radius:15px; font-weight:bold; color:black; animation: pulse 1.5s infinite;">EN JUEGO</span>`;
-        } else {
+            const cachedTimeMs = localStorage.getItem("wc_matches_cache_time_v6");
+            const updateTime = cachedTimeMs ? new Date(parseInt(cachedTimeMs)) : new Date();
+            const timeStrStr = updateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            middleContent = `<div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                <span style="background:var(--neon-gold); padding:3px 12px; border-radius:12px; font-weight:bold; color:black; font-size:1rem; animation: pulse 1.5s infinite;">${m.homeGoals} - ${m.awayGoals}</span>
+                <span style="font-size:0.6rem; color:var(--neon-gold); font-weight:800; text-transform:uppercase; letter-spacing:1px;">EN DIRECTO</span>
+                <span style="font-size:0.55rem; color:var(--text-muted); font-weight:normal; text-transform:none; margin-top:-2px;">Act: ${timeStrStr}</span>
+            </div>`;
+        } else if (m.status === "FINISHED") {
             middleContent = `<span style="background:var(--neon-magenta); padding:5px 15px; border-radius:15px; font-weight:bold;">${m.homeGoals} - ${m.awayGoals}</span>`;
+        } else {
+            const timeStr = m.date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            middleContent = `<span style="color:var(--neon-cyan); font-weight:bold;">${timeStr}</span>`;
         }
 
         matchDiv.innerHTML = `
-            <span style="flex:1; text-align:right;">${m.homeTeam}</span>
-            <div style="flex:1; display:flex; justify-content:center;">${middleContent}</div>
-            <span style="flex:1; text-align:left;">${m.awayTeam}</span>
+            <span style="flex:1; text-align:right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; padding-right: 8px;" title="${m.homeTeam}">${m.homeTeam}</span>
+            <div style="display:flex; justify-content:center; min-width: 80px;">${middleContent}</div>
+            <span style="flex:1; text-align:left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; padding-left: 8px;" title="${m.awayTeam}">${m.awayTeam}</span>
         `;
         return matchDiv;
     };
@@ -687,10 +706,10 @@ function updateMatchesUI(matches, nextMatch = null) {
 
         matchDiv.innerHTML = `
             <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Siguiente Partido (${localTimeStr})</p>
-            <div style="display:flex; justify-content:center; align-items:center; gap: 15px; margin-bottom: 12px; font-weight: bold; font-size: 1.2rem;">
-                <span>${nextMatch.homeTeam}</span>
-                <span style="color:var(--neon-magenta); font-size: 0.9rem;">VS</span>
-                <span>${nextMatch.awayTeam}</span>
+            <div style="display:flex; justify-content:center; align-items:center; gap: 15px; margin-bottom: 12px; font-weight: bold; font-size: 1.2rem; width: 100%;">
+                <span style="flex:1; text-align:right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;" title="${nextMatch.homeTeam}">${nextMatch.homeTeam}</span>
+                <span style="color:var(--neon-magenta); font-size: 0.9rem; min-width: 30px;">VS</span>
+                <span style="flex:1; text-align:left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;" title="${nextMatch.awayTeam}">${nextMatch.awayTeam}</span>
             </div>
             <div id="countdown-timer" style="font-family: monospace; font-size: 1.8rem; color: var(--neon-cyan); letter-spacing: 2px; text-shadow: 0 0 15px rgba(0,242,254,0.6);">
                 --:--:--:--
@@ -704,7 +723,7 @@ function updateMatchesUI(matches, nextMatch = null) {
             const now = new Date().getTime();
             const distance = nextMatch.date.getTime() - now;
 
-            if (distance < 0) {
+            if (distance < 0 || nextMatch.homeTeam === "México" || nextMatch.homeTeam === "Mexico") {
                 timerEl.innerHTML = "¡PARTIDO EN JUEGO!";
                 clearInterval(window.countdownInterval);
                 return;
@@ -723,9 +742,20 @@ function updateMatchesUI(matches, nextMatch = null) {
 
     }
     
-    // 3. Renderizar Partidos FINALIZADOS (Abajo del todo)
-    if (finishedMatches.length > 0) {
+    // 3. Renderizar OTROS PARTIDOS PROGRAMADOS PARA HOY
+    if (scheduledMatches.length > 0) {
         if (liveMatches.length > 0 || nextMatch) {
+            const separator = document.createElement('div');
+            separator.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
+            separator.style.margin = '15px 0';
+            container.appendChild(separator);
+        }
+        scheduledMatches.forEach(m => container.appendChild(createMatchRow(m)));
+    }
+
+    // 4. Renderizar Partidos FINALIZADOS (Abajo del todo)
+    if (finishedMatches.length > 0) {
+        if (liveMatches.length > 0 || nextMatch || scheduledMatches.length > 0) {
             const separator = document.createElement('div');
             separator.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
             separator.style.margin = '15px 0';
@@ -735,7 +765,7 @@ function updateMatchesUI(matches, nextMatch = null) {
     }
 
     if (matches.length === 0 && !nextMatch) {
-        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Esperando a que empiece el Mundial...</p>';
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No hay partidos a la vista o buscando conexión...</p>';
     }
 }
 
