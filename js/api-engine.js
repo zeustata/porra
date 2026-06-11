@@ -41,6 +41,17 @@ async function initEngine() {
             console.warn("No se pudo cargar official_answers.json");
         }
 
+        // 1.8 Cargar Live Overrides (sin caché, forzando la última versión)
+        let liveOverrides = {};
+        try {
+            const responseOverride = await fetch(`data/live_scores.json?t=${Date.now()}`);
+            if (responseOverride.ok) {
+                liveOverrides = await responseOverride.json();
+            }
+        } catch(e) {
+            console.warn("No se pudo cargar live_scores.json");
+        }
+
         // 2. Conectar a la API real con sistema de caché en localStorage (30 minutos)
         let realResults = {
             matches: [],
@@ -108,16 +119,17 @@ async function initEngine() {
 
         // Realizar mapeo y setup de resultados reales
         if (data && data.matches && data.matches.length > 0) {
-            // --- EMERGENCY OVERRIDE ---
+            // --- LIVE OVERRIDES ---
             data.matches.forEach(m => {
-                if (m.homeTeam && (m.homeTeam.name === "Mexico" || m.homeTeam.name === "México")) {
+                if (m.homeTeam && m.homeTeam.name && liveOverrides[m.homeTeam.name]) {
+                    m.status = liveOverrides[m.homeTeam.name].status || "IN_PLAY";
                     if (!m.score) m.score = {};
                     if (!m.score.fullTime) m.score.fullTime = {};
-                    m.score.fullTime.home = 0;
-                    m.score.fullTime.away = 1;
+                    m.score.fullTime.home = liveOverrides[m.homeTeam.name].home;
+                    m.score.fullTime.away = liveOverrides[m.homeTeam.name].away;
                 }
             });
-            // --------------------------
+            // ----------------------
             const allMatches = data.matches;
             globalAllMatches = allMatches; // Guardar globalmente para búsquedas
             
