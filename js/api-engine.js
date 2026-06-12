@@ -63,9 +63,10 @@ async function initEngine() {
         let data = null;
         
         try {
-            const CACHE_KEY = "wc_matches_cache_v6";
-            const CACHE_TIME_KEY = "wc_matches_cache_time_v6";
-            const CACHE_DURATION_MS = 300000; // 5 minutos
+            const CACHE_KEY = "wc_matches_cache_v8";
+            const CACHE_TIME_KEY = "wc_matches_cache_time_v8";
+            // Jitter para evitar que todos los usuarios disparen la API a la vez (5 min a 6.5 min)
+            const CACHE_DURATION_MS = 300000 + Math.floor(Math.random() * 90000); 
             
             const now = Date.now();
             const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -89,7 +90,11 @@ async function initEngine() {
                         localStorage.setItem(CACHE_KEY, JSON.stringify(data));
                         localStorage.setItem(CACHE_TIME_KEY, now.toString());
                     } else {
-                        console.warn("La API de Football-Data devolvió un error de red o de cuota.");
+                        console.warn("La API de Football-Data devolvió un error de red o de cuota: " + responseApi.status);
+                        try { document.getElementById('api-error-banner').innerHTML = `<p style="color:red; text-align:center; padding: 10px; border: 1px solid red; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ <b>Fallo API (HTTP ${responseApi.status})</b>. Si juegas desde un archivo local (file:///) es un bloqueo de CORS. Si no, es límite de peticiones.</p>`; } catch(e){}
+                        // PREVENCIÓN DE BUCLE: Si falla (ej: 429 Too Many Requests), establecemos un tiempo
+                        // para que este navegador NO vuelva a intentar durante al menos 2 minutos, protegiendo el token.
+                        localStorage.setItem(CACHE_TIME_KEY, (now - CACHE_DURATION_MS + 120000).toString());
                     }
                 }
             }
@@ -100,6 +105,7 @@ async function initEngine() {
             }
         } catch (apiError) {
             console.error("Error conectando a la API de Football-Data:", apiError);
+            try { document.getElementById('api-error-banner').innerHTML = `<p style="color:red; text-align:center; padding: 10px; border: 1px solid red; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ <b>Crash al cargar API:</b> ${apiError.message}. Seguramente un bloqueo CORS por abrirlo como archivo local o fallo de red.</p>`; } catch(e){}
         }
         
         // Fallback de contingencia a la caché o datos simulados si la carga falló
