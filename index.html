@@ -17,7 +17,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="css/style.css?v=51">
+    <link rel="stylesheet" href="css/style.css?v=54">
 </head>
 <body>
 
@@ -31,6 +31,9 @@
         <!-- Tarjeta Clasificación Fase de Grupos -->
         <div class="glass-card main-card">
             <h2>🏆 Clasificación Fase de Grupos</h2>
+            <div style="display: flex; justify-content: center; margin-top: -5px; margin-bottom: 15px;">
+                <button id="leaderboard-mode-btn" onclick="cycleLeaderboardMode()" style="background: rgba(255,51,102,0.1); color: #ff3366; border: 1px solid #ff3366; padding: 6px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(255,51,102,0.3); font-size: 0.9rem;">En Vivo! 🔴</button>
+            </div>
             <div class="leaderboard">
                 <div id="leaderboard-grupos" style="display:flex; flex-direction:column;">
                     <p style="text-align:center; color:var(--text-muted);">Cargando clasificación en tiempo real...</p>
@@ -249,7 +252,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api-engine.js?v=51"></script>
+    <script src="js/api-engine.js?v=54"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -279,7 +282,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=51')
+                navigator.serviceWorker.register('sw.js?v=54')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker
