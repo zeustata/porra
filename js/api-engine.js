@@ -137,7 +137,7 @@ async function initEngine() {
                 awayTeam: m.awayTeam.name,
                 homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
                 awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
-                status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) ? "LIVE" : "SCHEDULED")
+                status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && new Date(m.utcDate).getTime() <= Date.now())) ? "LIVE" : "SCHEDULED")
             }));
             
             // Calcular clasificaciones de grupos
@@ -166,7 +166,7 @@ async function initEngine() {
         // Filtrar partidos de la jornada para mostrarlos (en juego, finalizados u otros programados hoy)
         const today = new Date();
         const matchesToday = (data && data.matches) ? data.matches.filter(m => {
-            if (["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) return true;
+            if (["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && new Date(m.utcDate).getTime() <= Date.now())) return true;
             if (isSameDay(new Date(m.utcDate), today)) return true;
             return false;
         }).map(m => ({
@@ -175,7 +175,7 @@ async function initEngine() {
             awayTeam: m.awayTeam.name,
             homeGoals: (m.score && m.score.fullTime && m.score.fullTime.home !== null) ? m.score.fullTime.home : 0,
             awayGoals: (m.score && m.score.fullTime && m.score.fullTime.away !== null) ? m.score.fullTime.away : 0,
-            status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && (new Date(m.utcDate).getTime() <= Date.now() || m.homeTeam.name === "Mexico" || m.homeTeam.name === "México"))) ? "LIVE" : "SCHEDULED"),
+            status: m.status === "FINISHED" ? "FINISHED" : ((["IN_PLAY", "PAUSED"].includes(m.status) || (["TIMED", "SCHEDULED"].includes(m.status) && new Date(m.utcDate).getTime() <= Date.now())) ? "LIVE" : "SCHEDULED"),
             date: new Date(m.utcDate)
         })) : [];
 
