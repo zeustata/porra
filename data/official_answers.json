@@ -1,28 +1,132 @@
 [
-  { "question": "¿Qué selección marcará el primer gol del torneo?", "answer": null, "points": 1 },
-  { "question": "¿De qué selección será el primer amonestado del torneo?", "answer": null, "points": 1 },
-  { "question": "¿De qué selección será el primer expulsado del torneo?", "answer": null, "points": 1 },
-  { "question": "¿Qué selección lanzará el primer penalti del torneo?", "answer": null, "points": 1 },
-  { "question": "¿Ganará algún partido Cabo Verde?", "answer": null, "points": 2 },
-  { "question": "¿Se producirá algún gol en propia meta en el torneo?", "answer": null, "points": 2 },
-  { "question": "¿Llorará algún jugador en un partido?", "answer": null, "points": 2 },
-  { "question": "¿Qué selección encajará más goles en la fase de grupos?", "answer": null, "points": 4 },
-  { "question": "¿Qué selección encajará menos goles en la fase de grupos?", "answer": null, "points": 4 },
-  { "question": "¿Qué selección meterá más goles en la fase de grupos?", "answer": null, "points": 4 },
-  { "question": "¿Qué selección meterá menos goles en la fase de grupos?", "answer": null, "points": 4 },
-  { "question": "¿Quién marcará el primer gol de España del torneo?", "answer": null, "points": 3 },
-  { "question": "¿Qué selección le marcará el primer gol a España en la fase de grupos?", "answer": null, "points": 3 },
-  { "question": "¿Qué club tendrá el mayor número de jugadores de España en el 11 titular de su primer partido ante Cabo Verde?", "answer": null, "points": 2 },
-  { "question": "¿A qué jugador español le sacarán la primera tarjeta amarilla?", "answer": null, "points": 2 },
-  { "question": "¿Marcará España algún gol de cabeza a lo largo del torneo?", "answer": null, "points": 2 },
-  { "question": "¿Conseguirá España los 9 puntos de la fase de grupos?", "answer": null, "points": 2 },
-  { "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, o más de 6?", "answer": null, "points": 2 },
-  { "question": "¿Cuántos goles encajará España en la Primer Fase: 0, 1, 2, 3, o más de 3?", "answer": null, "points": 2 },
-  { "question": "¿Llegará España alguna tanda de penaltis?", "answer": null, "points": 2 },
-  { "question": "¿Pasará España de Cuartos de Final?", "answer": null, "points": 2 },
-  { "question": "¿Quién será el pichichi español?", "answer": null, "points": 3 },
-  { "question": "¿Qué selección marcará el último gol del torneo?", "answer": null, "points": 5 },
-  { "question": "¿Qué selección tendrá el mayor número de jugadores en el 11 ideal del torneo? (Según la FIFA)", "answer": null, "points": 10 },
-  { "question": "¿Quién será el máximo goleador del campeonato?", "answer": null, "points": 15 },
-  { "question": "¿Quién será el mejor jugador de la final? (MVP, según la FIFA)", "answer": null, "points": 20 }
+  {
+    "question": "¿Qué selección marcará el primer gol del torneo?",
+    "answer": null,
+    "points": 1
+  },
+  {
+    "question": "¿De qué selección será el primer amonestado del torneo?",
+    "answer": null,
+    "points": 1
+  },
+  {
+    "question": "¿De qué selección será el primer expulsado del torneo?",
+    "answer": null,
+    "points": 1
+  },
+  {
+    "question": "¿Qué selección lanzará el primer penalti del torneo?",
+    "answer": null,
+    "points": 1
+  },
+  {
+    "question": "¿Ganará algún partido Cabo Verde?",
+    "answer": null,
+    "points": 1
+  },
+  {
+    "question": "¿Se producirá algún gol en propia meta en el torneo?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Logrará algún jugador un hat-trick?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Qué selección encajará más goles en la fase de grupos?",
+    "answer": null,
+    "points": 4
+  },
+  {
+    "question": "¿Qué selección encajará menos goles en la fase de grupos?",
+    "answer": null,
+    "points": 4
+  },
+  {
+    "question": "¿Qué selección meterá más goles en la fase de grupos?",
+    "answer": null,
+    "points": 4
+  },
+  {
+    "question": "¿Qué selección meterá menos goles en la fase de grupos?",
+    "answer": null,
+    "points": 4
+  },
+  {
+    "question": "¿Quién marcará el primer gol de España del torneo?",
+    "answer": null,
+    "points": 3
+  },
+  {
+    "question": "¿Qué selección le marcará el primer gol a España en la fase de grupos? Cabo Verde (16Jun), Arabia Saudí (21Jun), Uruguay (27Jun)",
+    "answer": null,
+    "points": 3
+  },
+  {
+    "question": "¿Qué club tendrá el mayor número de jugadores de España en el 11 titular de su primer partido ante Cabo Verde?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿A qué jugador español le sacarán la primera tarjeta amarilla?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Marcará España algún gol de cabeza a lo largo del torneo?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Conseguirá España los 9 puntos de la fase de grupos?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, ó más de 6?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Cuántos goles encajará España en la Primer Fase: 0-1, 2-3, ó más de 3?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Jugará España alguna tanda de penaltis?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Pasará España de Cuartos de Final?",
+    "answer": null,
+    "points": 2
+  },
+  {
+    "question": "¿Quién será el pichichi español?",
+    "answer": null,
+    "points": 3
+  },
+  {
+    "question": "¿Qué selección marcará el último gol del torneo? (No cuenta la tanda de penaltis; sí la posible prórroga)",
+    "answer": null,
+    "points": 5
+  },
+  {
+    "question": "¿Qué selección tendrá el mayor número de jugadores en el 11 ideal del torneo ? (Según la FIFA)",
+    "answer": null,
+    "points": 10
+  },
+  {
+    "question": "¿Quién será el máximo goleador del campeonato?",
+    "answer": null,
+    "points": 15
+  },
+  {
+    "question": "¿Quién será el mejor jugador de la final? (MVP, según la FIFA)",
+    "answer": null,
+    "points": 20
+  }
 ]
