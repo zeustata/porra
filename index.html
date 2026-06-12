@@ -17,7 +17,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="css/style.css?v=54">
+    <link rel="stylesheet" href="css/style.css?v=55">
 </head>
 <body>
 
@@ -105,6 +105,9 @@
                     <li>
                         <span class="badge-legend badge-prov" style="min-width: 65px;">prov 📊</span>
                         <span style="font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">Puntos <strong>provisionales</strong> según la clasificación actual de los grupos.</span>
+                    </li>
+                    <li style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                        <span style="font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">💡 <strong>Nota:</strong> ¡El cartel de <span style="color: #ff3366; font-weight: bold; background: rgba(255,51,102,0.1); padding: 2px 5px; border-radius: 8px;">En Vivo! 🔴</span> de arriba es un botón! Púlsalo para ver otras clasificaciones (solo puntos base, o base + preguntas).</span>
                     </li>
                 </ul>
             </div>
@@ -252,7 +255,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api-engine.js?v=54"></script>
+    <script src="js/api-engine.js?v=55"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -282,7 +285,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=54')
+                navigator.serviceWorker.register('sw.js?v=55')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker
