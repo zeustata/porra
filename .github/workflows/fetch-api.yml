@@ -1,0 +1,40 @@
+name: Fetch API Data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-api-cache:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Fetch and push data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          mkdir proxy-data
+          cd proxy-data
+          git init
+          git checkout -b api-data
+          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          
+          git pull origin api-data || echo "Creando rama por primera vez"
+          
+          echo "Descargando datos de football-data.org..."
+          HTTP_STATUS=$(curl -s -o api_cache_temp.json -w "%{http_code}" -H "X-Auth-Token: eb33115c8c4843729c576baff6e57958" "https://api.football-data.org/v4/competitions/WC/matches")
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+              echo "Éxito (200). Guardando JSON."
+              mv api_cache_temp.json api_cache.json
+              git add api_cache.json
+              git commit -m "Auto-update API cache: $(date)" || echo "No hay cambios nuevos"
+              git push origin api-data
+          else
+              echo "Error al conectar con la API (Código: $HTTP_STATUS)"
+              cat api_cache_temp.json
+              exit 1
+          fi

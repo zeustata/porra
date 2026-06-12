@@ -65,8 +65,8 @@ async function initEngine() {
         try {
             const CACHE_KEY = "wc_matches_cache_v8";
             const CACHE_TIME_KEY = "wc_matches_cache_time_v8";
-            // Jitter para evitar que todos los usuarios disparen la API a la vez (5 min a 6.5 min)
-            const CACHE_DURATION_MS = 300000 + Math.floor(Math.random() * 90000); 
+            // Jitter no es tan crítico ahora, pero lo dejamos por seguridad.
+            const CACHE_DURATION_MS = 60000; // 1 minuto, GitHub Action se actualiza cada 5.
             
             const now = Date.now();
             const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -76,26 +76,17 @@ async function initEngine() {
                 // Usar caché válida
                 data = JSON.parse(cachedData);
             } else {
-                // Si hay un token configurado, llamamos a la API
-                if (API_KEY && API_KEY !== "TU_TOKEN_DE_FOOTBALL_DATA_ORG" && API_KEY.trim() !== "") {
-                    const apiUrl = `https://api.football-data.org/v4/competitions/WC/matches`;
-                    const responseApi = await fetch(apiUrl, {
-                        method: 'GET',
-                        headers: {
-                            "X-Auth-Token": API_KEY
-                        }
-                    });
-                    if (responseApi.ok) {
-                        data = await responseApi.json();
-                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-                        localStorage.setItem(CACHE_TIME_KEY, now.toString());
-                    } else {
-                        console.warn("La API de Football-Data devolvió un error de red o de cuota: " + responseApi.status);
-                        try { document.getElementById('api-error-banner').innerHTML = `<p style="color:red; text-align:center; padding: 10px; border: 1px solid red; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ <b>Fallo API (HTTP ${responseApi.status})</b>. Si juegas desde un archivo local (file:///) es un bloqueo de CORS. Si no, es límite de peticiones.</p>`; } catch(e){}
-                        // PREVENCIÓN DE BUCLE: Si falla (ej: 429 Too Many Requests), establecemos un tiempo
-                        // para que este navegador NO vuelva a intentar durante al menos 2 minutos, protegiendo el token.
-                        localStorage.setItem(CACHE_TIME_KEY, (now - CACHE_DURATION_MS + 120000).toString());
-                    }
+                const proxyUrl = `https://raw.githubusercontent.com/zeustata/porra/api-data/api_cache.json?v=${now}`;
+                const responseApi = await fetch(proxyUrl, { cache: "no-store" });
+                
+                if (responseApi.ok) {
+                    data = await responseApi.json();
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                    localStorage.setItem(CACHE_TIME_KEY, now.toString());
+                } else {
+                    console.warn("Error al cargar datos desde GitHub Proxy: " + responseApi.status);
+                    try { document.getElementById('api-error-banner').innerHTML = `<p style="color:red; text-align:center; padding: 10px; border: 1px solid red; background: rgba(255,0,0,0.1); border-radius: 8px;">⚠️ <b>Fallo del Servidor de Datos (HTTP ${responseApi.status})</b>. El robot de sincronización aún no ha subido los datos. Dale un minuto.</p>`; } catch(e){}
+                    localStorage.setItem(CACHE_TIME_KEY, (now - CACHE_DURATION_MS + 60000).toString());
                 }
             }
             
