@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porra-cache-v51';
+const CACHE_NAME = 'porra-cache-v52';
 const ASSETS = [
     './',
     './index.html',
@@ -41,7 +41,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     // 1. Excluir APIs externas de la caché del Service Worker (el motor de la app ya maneja su caché en localStorage)
-    if (url.hostname.includes('api.football-data.org') || url.hostname.includes('api.rss2json.com')) {
+    if (url.hostname.includes('api.football-data.org') || url.hostname.includes('api.rss2json.com') || url.hostname.includes('raw.githubusercontent.com')) {
         event.respondWith(fetch(event.request));
         return;
     }
