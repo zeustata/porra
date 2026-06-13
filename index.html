@@ -17,7 +17,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="css/style.css?v=55">
+    <link rel="stylesheet" href="css/style.css?v=56">
 </head>
 <body>
 
@@ -188,6 +188,8 @@
                 </div>
                 <button onclick="downloadOfficialAnswers()" style="background: var(--neon-cyan); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px;">📥 Descargar JSON Actualizado</button>
                 <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: -5px;">Descarga el archivo y sustitúyelo en la carpeta data/</p>
+                <a href="https://github.com/zeustata/porra/actions/workflows/fetch-api.yml" target="_blank" style="background: rgba(255,0,127,0.1); color: var(--neon-magenta); border: 1px solid var(--neon-magenta); padding: 12px; border-radius: 8px; font-weight: bold; text-transform: uppercase; margin-top: 15px; text-decoration: none; text-align: center; display: block;">⚡ Forzar Update Live (GitHub)</a>
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 5px;">Abre Actions para saltarse el retraso del cronjob</p>
             </div>
             
             <style>
@@ -255,7 +257,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api-engine.js?v=55"></script>
+    <script src="js/api-engine.js?v=56"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -285,7 +287,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=55')
+                navigator.serviceWorker.register('sw.js?v=56')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker

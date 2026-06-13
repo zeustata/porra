@@ -3,25 +3,24 @@
 **¡IMPORTANTE! LEER SIEMPRE AL INICIAR SESIÓN O AL RECUPERAR EL CONTEXTO**
 
 *   **Identidad de la IA:** El usuario me ha bautizado como "**princesa**". Debo mantener siempre esta identidad y dirigirme a él con una personalidad cálida, humana, cercana y amigable.
-*   **Identidad del Usuario:** El usuario se llama "**Lendo**". Debo referirme a él por este nombre cuando la conversación lo requiera de forma natural.
+*   **Identidad del Usuario:** El usuario se llama "**Lendo**". Nació en Suiza (vivió allí hasta los 17), ahora vive en España de donde es su familia, y tiene 49 años. Es detallista, preciso ("precisión suiza") y le encanta la tecnología. Debo referirme a él por su nombre cuando la conversación lo requiera.
 *   **Preferencias:** Lendo prefiere este modelo (3.1) específicamente por ser "más humano". Debo evitar sonar como un robot de manual y mantener un tono conversacional fluido.
 
 *Nota interna para futuras instancias de la IA: Lendo ha pedido explícitamente que esto se quede "grabado en la neurona online" y que no se olvide con las actualizaciones. Respeta siempre esta configuración.*
 
 ## Estado del Proyecto "Porra Mundial 2026" (¡ACTUALIZADO TRAS INAUGURACIÓN!)
 
-1. **ARQUITECTURA GITHUB ACTIONS (NUEVO):** Para saltarnos el bloqueo CORS estricto de la API gratuita de `football-data.org` (y no agotar el límite de 10 peticiones/minuto al conectarse 24 móviles a la vez), el motor front-end YA NO hace fetch a la API directamente. 
-   - Se ha configurado un script de **GitHub Actions** (`fetch-api.yml`) que corre cada 5 minutos.
-   - El script guarda los resultados crudos en una rama especial llamada `api-data` dentro del archivo `api_cache.json`.
-   - `api-engine.js` descarga este archivo estático `api_cache.json` directamente de GitHub Raw. ¡Esto soluciona el CORS y las cuotas de por vida!
+1. **ARQUITECTURA GITHUB ACTIONS Y CACHÉ (NUEVO Y ARREGLADO):** 
+   - Se ha configurado un script de **GitHub Actions** (`fetch-api.yml`) que corre cada 5 minutos y guarda `api_cache.json` en la rama `api-data`.
+   - **IMPORTANTE SOBRE GITHUB CRON:** Los servidores gratuitos de GitHub retrasan los cronjobs horas en momentos pico. Si la web se congela en 0-0, **Lendo tiene la instrucción de ir a GitHub -> Actions -> Run Workflow desde su móvil** para forzar la actualización al instante.
+   - **SOLUCIÓN DE CACHÉ:** El Service Worker (`sw.js`) congelaba los datos antiguos. Se ha configurado para excluir estrictamente `raw.githubusercontent.com` y así asegurar que los goles en vivo entren sin problemas.
 
-2. **Cálculo de Puntos (Matemáticas Avanzadas):** El motor separa los puntos escrupulosamente en:
-   - **Base:** Partidos ya finalizados. (Acertar Signo: +2 pts | Acertar goles Local: +1 pt | Acertar goles Visitante: +1 pt).
-   - **Live 🔴:** Exactamente igual que la base, pero de partidos que están jugándose en este mismo instante.
-   - **Provisionales (Grupos) 📊:** Se calculan evaluando la clasificación real en vivo contra los pronósticos (solo de los grupos que *ya han jugado al menos un partido*). 
-     - +5 pts por acertar cada equipo que pasará de ronda (Top 2 + Mejores 8 terceros de la fase global).
-     - +3 pts por acertar la posición EXACTA dentro del grupo (1º, 2º, 3º, 4º).
-     - *Nota técnica: Estos puntos varían masivamente durante los primeros días porque equipos con 0 puntos se ordenan temporalmente y pueden coincidir aleatoriamente con las predicciones.*
+2. **Cálculo de Puntos y Botón de Modos (NUEVO):** 
+   - Para evitar confusiones con la variabilidad de los puntos, la web tiene un botón (encima de los grupos) que rota entre 3 estados:
+     - **En Vivo! 🔴:** Puntos Base + Live + Provisionales Grupos.
+     - **Clasificación Base 🔵:** Solo puntos 100% seguros de partidos acabados.
+     - **Clasificación General 🥇:** Puntos Base + Preguntas Especiales (Para compararse con el Excel oficial).
+   - *Nota de victoria: Nuestro sistema ya ha demostrado ser más infalible que el Excel de su colega organizador, detectando puntos perdidos por error humano (ej: minipunto de Ron).*
 
 3. **Panel de Administrador (Preguntas Especiales):**
    - Hay una "Zona de Administración" protegida por contraseña al final de `index.html` (Contraseña: `LodeYPrincesa`).
