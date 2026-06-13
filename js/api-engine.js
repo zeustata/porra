@@ -424,9 +424,9 @@ function calculateScores(participants, realResults, officialAnswers = []) {
             p.predictions.specialQuestionsAnswers.forEach(pAnswer => {
                 const off = officialAnswers.find(o => o.question === pAnswer.question);
                 if (off && off.answer !== null && off.answer !== "") {
-                    // Normalizar respuestas a minúsculas para evitar fallos tontos (ej: "México" vs "méxico")
-                    const ans1 = pAnswer.answer.toString().trim().toLowerCase();
-                    const ans2 = off.answer.toString().trim().toLowerCase();
+                    // Normalizar respuestas a minúsculas y quitar tildes para evitar fallos ortográficos (ej: "Sí" vs "Si")
+                    const ans1 = pAnswer.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const ans2 = off.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     if (ans1 === ans2) {
                         specialPts += off.points;
                     }
