@@ -462,12 +462,8 @@ function calculateScores(participants, realResults, officialAnswers = []) {
                     else if (real.homeGoals < real.awayGoals) realSign = "2";
 
                     let predSign = "X";
-                    if (pred.sign) {
-                        predSign = pred.sign;
-                    } else {
-                        if (pred.homeGoals > pred.awayGoals) predSign = "1";
-                        else if (pred.homeGoals < pred.awayGoals) predSign = "2";
-                    }
+                    if (pred.homeGoals > pred.awayGoals) predSign = "1";
+                    else if (pred.homeGoals < pred.awayGoals) predSign = "2";
 
                     if (predSign === realSign) {
                         pts += 2;
@@ -943,7 +939,11 @@ function showParticipantPredictions(participantId) {
                 if (homeGoalsReal > awayGoalsReal) realSign = "1";
                 else if (homeGoalsReal < awayGoalsReal) realSign = "2";
                 
-                if (m.sign === realSign) matchPts += 2;
+                let predSignUi = "X";
+                if (m.homeGoals > m.awayGoals) predSignUi = "1";
+                else if (m.homeGoals < m.awayGoals) predSignUi = "2";
+
+                if (predSignUi === realSign) matchPts += 2;
                 if (m.homeGoals === homeGoalsReal) matchPts += 1;
                 if (m.awayGoals === awayGoalsReal) matchPts += 1;
                 
@@ -964,7 +964,7 @@ function showParticipantPredictions(participantId) {
                                 ${m.homeGoals} - ${m.awayGoals}
                             </span>
                             <span style="background: rgba(0,242,254,0.1); border: 1px solid rgba(0,242,254,0.3); color: var(--neon-cyan); padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">
-                                Signo: ${m.sign}
+                                Signo: ${m.homeGoals > m.awayGoals ? "1" : (m.homeGoals < m.awayGoals ? "2" : "X")}
                             </span>
                         </div>
                         <span style="font-weight: 600; font-size: 0.85rem; flex: 1; text-align: left; padding-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${awayName}</span>
