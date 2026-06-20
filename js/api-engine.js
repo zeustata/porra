@@ -862,16 +862,19 @@ function populateParticipantSelect(participants) {
 
 function showParticipantPredictions(participantId) {
     const container = document.getElementById('participant-predictions');
+    const pdfBtn = document.getElementById('generate-pdf-btn');
     if (!container) return;
 
     if (!participantId) {
         container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">Elige alguien para ver sus apuestas</p>';
+        if (pdfBtn) pdfBtn.style.display = 'none';
         return;
     }
 
     const p = allParticipants.find(p => p.id == participantId);
     if (!p || !p.predictions) {
         container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No hay pronósticos disponibles.</p>';
+        if (pdfBtn) pdfBtn.style.display = 'none';
         return;
     }
 
@@ -884,8 +887,11 @@ function showParticipantPredictions(participantId) {
                 <p style="color:var(--text-muted); font-size: 0.85rem;">Para evitar trampas, los pronósticos no serán públicos hasta que finalice el periodo de inscripción (6 de Junio).</p>
             </div>
         `;
+        if (pdfBtn) pdfBtn.style.display = 'none';
         return;
     }
+    
+    if (pdfBtn) pdfBtn.style.display = 'block';
 
     // Render Tab Buttons and Tab Content Areas
     container.innerHTML = `
@@ -1228,4 +1234,122 @@ window.downloadOfficialAnswers = function() {
     downloadAnchorNode.remove();
     
     alert('Archivo official_answers.json descargado. ¡Reemplázalo en tu carpeta data/ y súbelo a GitHub!');
+};
+
+window.generateParticipantPDF = function() {
+    const participantId = document.getElementById('participant-select').value;
+    if (!participantId) return;
+
+    const p = allParticipants.find(p => p.id == participantId);
+    if (!p || !p.predictions) return;
+
+    // Solo permitir si pasamos el snoop
+    const deadline = new Date("2026-06-06T00:00:00Z");
+    if (new Date() < deadline) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Título principal
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.text("Porra Mundial 2026", 105, 15, null, null, "center");
+    
+    // Subtítulo
+    doc.setFontSize(14);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Informe de Participante: ${p.name}`, 105, 23, null, null, "center");
+    
+    // Fecha de generación
+    doc.setFontSize(10);
+    doc.text(`Generado el: ${new Date().toLocaleString('es-ES')}`, 105, 30, null, null, "center");
+
+    let tableData = [];
+    let totalMatchPts = 0;
+
+    // Procesar partidos finalizados o en juego
+    if (p.predictions.matches && p.predictions.matches.length > 0) {
+        p.predictions.matches.forEach(m => {
+            const realMatch = globalAllMatches.find(r => r.id === m.matchId);
+            if (realMatch && (realMatch.status === "FINISHED" || realMatch.status === "LIVE" || ["IN_PLAY", "PAUSED"].includes(realMatch.status))) {
+                let homeName = m.homeTeam || realMatch.homeTeam.name;
+                let awayName = m.awayTeam || realMatch.awayTeam.name;
+                
+                const homeGoalsReal = (realMatch.score && realMatch.score.fullTime && realMatch.score.fullTime.home !== null) ? realMatch.score.fullTime.home : 0;
+                const awayGoalsReal = (realMatch.score && realMatch.score.fullTime && realMatch.score.fullTime.away !== null) ? realMatch.score.fullTime.away : 0;
+                
+                let matchPts = 0;
+                let realSign = "X";
+                if (homeGoalsReal > awayGoalsReal) realSign = "1";
+                else if (homeGoalsReal < awayGoalsReal) realSign = "2";
+                
+                if (m.sign === realSign) matchPts += 2;
+                if (m.homeGoals === homeGoalsReal) matchPts += 1;
+                if (m.awayGoals === awayGoalsReal) matchPts += 1;
+                
+                totalMatchPts += matchPts;
+                
+                tableData.push([
+                    `${homeName} vs ${awayName}`,
+                    `${m.homeGoals}-${m.awayGoals} (Signo: ${m.sign})`,
+                    `${homeGoalsReal}-${awayGoalsReal} (${realMatch.status === "FINISHED" ? "Final" : "En Juego"})`,
+                    `+${matchPts}`
+                ]);
+            }
+        });
+    }
+
+    if (tableData.length === 0) {
+        doc.setFontSize(12);
+        doc.text("Aún no hay partidos jugados o en juego para mostrar.", 105, 45, null, null, "center");
+        doc.save(`informe_porra_${p.name.replace(/\s+/g, '_')}.pdf`);
+        return;
+    }
+
+    // Dibujar la tabla
+    doc.autoTable({
+        startY: 35,
+        head: [['Partido', 'Tu Apuesta', 'Resultado Real', 'Puntos']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [255, 51, 102] },
+        styles: { fontSize: 9, halign: 'center' },
+        columnStyles: {
+            0: { halign: 'left', cellWidth: 70 }
+        }
+    });
+
+    let finalY = doc.lastAutoTable.finalY + 10;
+    
+    // Obtener los puntos totales del engine
+    let basePts = 0;
+    let livePts = 0;
+    let groupPts = 0;
+    let specialPts = 0;
+    
+    // Buscamos al participante en el último ranking para tener los puntos exactos que se ven en pantalla
+    const rankingData = lastGruposLeaderboard.find(r => r.name === p.name);
+    if (rankingData) {
+        basePts = rankingData.basePoints || 0;
+        livePts = rankingData.livePoints || 0;
+        groupPts = rankingData.groupPoints || 0;
+        specialPts = rankingData.specialPoints || 0;
+    }
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Resumen de Puntos Actuales:", 14, finalY);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(50, 50, 50);
+    doc.text(`- Puntos por Partidos: ${basePts + livePts}`, 14, finalY + 6);
+    doc.text(`- Puntos por Grupos (Prov): ${groupPts}`, 14, finalY + 12);
+    doc.text(`- Puntos Especiales: ${specialPts}`, 14, finalY + 18);
+    
+    doc.setFontSize(14);
+    doc.setTextColor(255, 51, 102);
+    const totalPts = basePts + livePts + groupPts + specialPts;
+    doc.text(`Total Acumulado: ${totalPts} pts`, 14, finalY + 28);
+
+    doc.save(`informe_porra_${p.name.replace(/\s+/g, '_')}.pdf`);
 };
