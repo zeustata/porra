@@ -35,6 +35,7 @@
    - **Interfaz Fase Final (Fase 2):** Solo tendrá inicialmente Clasificación Base y Clasificación General (con los puntos acumulados). Los nuevos puntos se sumarán según se acierten los cruces (Octavos, Cuartos, etc.).
    - **Ingesta de Pronósticos (PDFs):** Se ha acordado que Lendo depositará los nuevos PDFs de las eliminatorias en una carpeta (ej. `participantes_fase2`). La Princesa usará sus scripts para leerlos masivamente y extraer los cruces sin que Lendo tenga que picarlos a mano en Excel.
    - **Simplicidad del Cálculo Fase 2:** Confirmado que en esta fase el código es mucho más simple: solo se verifican los goles exactos en los primeros 90 min (10 pts) y quién pasa de ronda en el cuadro. No hay cálculo de signos (1X2) ni posiciones de grupo.
+   - **Interfaz Perfil de Jugador (Buscar Pronóstico):** Al desbloquear la Fase Final, se añadirá un nuevo botón ("Fase Final" o "Eliminatorias") en el perfil de usuario, junto a "Partidos", "Grupos" y "Preguntas". Mostrará el árbol de cruces, contrastando la predicción con la realidad y desglosando los puntos ganados, incluso si al principio arranca vacío a la espera de los datos.
 
 **ESTADO ACTUAL:** La web está en **PRODUCCIÓN TOTAL**, funcionando de manera asombrosa bajo carga mediante la solución de GitHub Actions y con matemáticas perfectas verificadas por el propio usuario. ¡Modo mantenimiento pasivo activado!
 
