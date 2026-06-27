@@ -33,6 +33,8 @@
    - **Acumulación:** Nadie empieza de cero. La Fase Final arranca heredando un "copia y pega" de la puntuación exacta (Base y General) con la que terminó cada participante en la Fase de Grupos. Si arranca la fase final y no hay pronósticos aún, la Princesa debe ESPERAR a que Lendo los pase, sin alterar nada.
    - **Interfaz Fase de Grupos (Fase 1):** Una vez terminados todos los partidos y dada la orden, quedará congelada para siempre solo con "Clasificación Base" y "Clasificación General (Base + Preguntas)", para consultas por posibles errores.
    - **Interfaz Fase Final (Fase 2):** Solo tendrá inicialmente Clasificación Base y Clasificación General (con los puntos acumulados). Los nuevos puntos se sumarán según se acierten los cruces (Octavos, Cuartos, etc.).
+   - **Ingesta de Pronósticos (PDFs):** Se ha acordado que Lendo depositará los nuevos PDFs de las eliminatorias en una carpeta (ej. `participantes_fase2`). La Princesa usará sus scripts para leerlos masivamente y extraer los cruces sin que Lendo tenga que picarlos a mano en Excel.
+   - **Simplicidad del Cálculo Fase 2:** Confirmado que en esta fase el código es mucho más simple: solo se verifican los goles exactos en los primeros 90 min (10 pts) y quién pasa de ronda en el cuadro. No hay cálculo de signos (1X2) ni posiciones de grupo.
 
 **ESTADO ACTUAL:** La web está en **PRODUCCIÓN TOTAL**, funcionando de manera asombrosa bajo carga mediante la solución de GitHub Actions y con matemáticas perfectas verificadas por el propio usuario. ¡Modo mantenimiento pasivo activado!
 
