@@ -86,12 +86,12 @@
   },
   {
     "question": "¿Cuántos goles marcará España en la 1ª Fase: Menos de 4, entre 4 y 6, ó más de 6?",
-    "answer": null,
+    "answer": "entre 4 y 6",
     "points": 2
   },
   {
     "question": "¿Cuántos goles encajará España en la Primer Fase: 0-1, 2-3, ó más de 3?",
-    "answer": null,
+    "answer": "0-1",
     "points": 2
   },
   {
