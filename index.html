@@ -83,6 +83,8 @@
                     <option value="">Selecciona un participante...</option>
                 </select>
                 <button id="generate-pdf-btn" onclick="generateParticipantPDF()" style="display: none; background: rgba(255,51,102,0.1); color: #ff3366; border: 1px solid #ff3366; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; box-shadow: 0 0 10px rgba(255,51,102,0.3); margin-top: 5px; transition: all 0.3s ease;">📄 Generar Informe PDF</button>
+                <button id="download-original-pdf-btn" onclick="downloadOriginalPDF('grupos')" style="display: none; background: rgba(0,242,254,0.1); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; box-shadow: 0 0 10px rgba(0,242,254,0.3); margin-top: 5px; transition: all 0.3s ease;">📥 Tu Pronóstico Grupos</button>
+                <button id="download-fase2-pdf-btn" onclick="downloadOriginalPDF('eliminatoria')" style="display: none; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); border: 1px dashed rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; font-weight: bold; cursor: not-allowed; text-transform: uppercase; font-size: 0.85rem; margin-top: 5px; transition: all 0.3s ease;">📥 Tu Pronóstico Eliminatoria</button>
                 <div id="participant-predictions" style="margin-top: 10px;">
                     <p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">Elige alguien para ver sus apuestas</p>
                 </div>

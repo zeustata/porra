@@ -862,11 +862,15 @@ function populateParticipantSelect(participants) {
 function showParticipantPredictions(participantId) {
     const container = document.getElementById('participant-predictions');
     const pdfBtn = document.getElementById('generate-pdf-btn');
+    const origPdfBtn = document.getElementById('download-original-pdf-btn');
+    const f2PdfBtn = document.getElementById('download-fase2-pdf-btn');
     if (!container) return;
 
     if (!participantId) {
         container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size: 0.9rem;">Elige alguien para ver sus apuestas</p>';
         if (pdfBtn) pdfBtn.style.display = 'none';
+        if (origPdfBtn) origPdfBtn.style.display = 'none';
+        if (f2PdfBtn) f2PdfBtn.style.display = 'none';
         return;
     }
 
@@ -874,6 +878,8 @@ function showParticipantPredictions(participantId) {
     if (!p || !p.predictions) {
         container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No hay pronósticos disponibles.</p>';
         if (pdfBtn) pdfBtn.style.display = 'none';
+        if (origPdfBtn) origPdfBtn.style.display = 'none';
+        if (f2PdfBtn) f2PdfBtn.style.display = 'none';
         return;
     }
 
@@ -887,10 +893,14 @@ function showParticipantPredictions(participantId) {
             </div>
         `;
         if (pdfBtn) pdfBtn.style.display = 'none';
+        if (origPdfBtn) origPdfBtn.style.display = 'none';
+        if (f2PdfBtn) f2PdfBtn.style.display = 'none';
         return;
     }
     
     if (pdfBtn) pdfBtn.style.display = 'block';
+    if (origPdfBtn) origPdfBtn.style.display = 'block';
+    if (f2PdfBtn) f2PdfBtn.style.display = 'block';
 
     // Render Tab Buttons and Tab Content Areas
     container.innerHTML = `
@@ -1454,4 +1464,59 @@ window.generateParticipantPDF = function() {
     doc.text(`Total Acumulado: ${totalPts} pts`, 14, startY + 28);
 
     doc.save(`informe_porra_${p.name.replace(/\s+/g, '_')}.pdf`);
+};
+
+// --- Mapeo de PDFs Originales ---
+const pdfMapping = {
+    "Hevia": "J1 - HEVIA.pdf",
+    "Acebal": "J2 - ACEBAL.pdf",
+    "Lendo": "J3 - LODE.pdf",
+    "Alex Fdez.": "J4 - ALEX FDEZ.pdf",
+    "Burgui": "J5 - BURGUI.pdf",
+    "Victor": "J6 - VÍCTOR.pdf",
+    "Riki": "J7 - RIKI.pdf",
+    "Adri": "J8 - ADRI.pdf",
+    "Ron": "J9 - RON.pdf",
+    "Jony": "J10 - JONY.pdf",
+    "Viji": "J11 - VIJI.pdf",
+    "Sergio": "J12 - SERGIO.pdf",
+    "Hugo": "J13 - HUGO.pdf",
+    "Carmen": "J14 - CARMEN.pdf",
+    "Costales": "J15 - COSTALES.pdf",
+    "Miguel": "J16 - MIGUEL.pdf",
+    "Diego": "J17 - DIEGO.pdf",
+    "Barriga": "J18 - BARRIGA.pdf",
+    "Alejandro": "J19 - ALEJANDRO.pdf",
+    "Canal": "J20 - CANAL.pdf",
+    "Sergio Alfonso": "J21 - SERGIO ALFONSO.pdf",
+    "Murias": "J22 - MURIAS.pdf",
+    "More": "J23 - MORE.pdf",
+    "Ulpiano": "J24 - ULPIANO.pdf"
+};
+
+window.downloadOriginalPDF = function(type) {
+    if (type === 'eliminatoria') {
+        alert("¡Paciencia! Aún no se han jugado las eliminatorias ni tenemos tus pronósticos. \nCuando empiece la Fase 2 este botón descargará tu PDF actualizado.");
+        return;
+    }
+
+    const participantId = document.getElementById('participant-select').value;
+    if (!participantId) return;
+
+    const p = allParticipants.find(p => p.id == participantId);
+    if (!p) return;
+
+    const fileName = pdfMapping[p.name];
+    if (fileName) {
+        // Create an invisible anchor to trigger the download
+        const a = document.createElement('a');
+        a.href = `participantes/${encodeURIComponent(fileName)}`;
+        a.download = fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } else {
+        alert("No se ha encontrado el PDF original para " + p.name);
+    }
 };
