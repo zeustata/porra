@@ -1299,28 +1299,125 @@ window.generateParticipantPDF = function() {
         });
     }
 
+    let startY = 35;
     if (tableData.length === 0) {
-        doc.setFontSize(12);
-        doc.text("Aún no hay partidos jugados o en juego para mostrar.", 105, 45, null, null, "center");
-        doc.save(`informe_porra_${p.name.replace(/\s+/g, '_')}.pdf`);
-        return;
+        doc.setFontSize(10);
+        doc.text("No hay partidos jugados o en juego.", 14, startY);
+        startY += 10;
+    } else {
+        // Dibujar la tabla
+        doc.autoTable({
+            startY: startY,
+            head: [['Partido', 'Tu Apuesta', 'Resultado Real', 'Puntos']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [255, 51, 102] },
+            styles: { fontSize: 9, halign: 'center' },
+            columnStyles: {
+                0: { halign: 'left', cellWidth: 70 }
+            }
+        });
+        startY = doc.lastAutoTable.finalY + 15;
     }
 
-    // Dibujar la tabla
-    doc.autoTable({
-        startY: 35,
-        head: [['Partido', 'Tu Apuesta', 'Resultado Real', 'Puntos']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [255, 51, 102] },
-        styles: { fontSize: 9, halign: 'center' },
-        columnStyles: {
-            0: { halign: 'left', cellWidth: 70 }
-        }
-    });
+    // Procesar Grupos
+    let groupData = [];
+    if (p.predictions.groupStandings) {
+        Object.keys(p.predictions.groupStandings).forEach(groupId => {
+            const predGroup = p.predictions.groupStandings[groupId];
+            const realGroup = globalRealResults.groupStandings ? globalRealResults.groupStandings[groupId] : null;
+            
+            let resultStr = "";
+            let groupPtsTotal = 0;
 
-    let finalY = doc.lastAutoTable.finalY + 10;
-    
+            predGroup.forEach((team, idx) => {
+                if (idx > 2) return; // Sólo nos importan los 3 primeros si es que pasaran 3
+                let ptSum = 0;
+                if (realGroup && realGroup.length > 0) {
+                    const isClassifiedReal = globalClassifiedTlasList.includes(team);
+                    const isClassifiedPred = idx < 3;
+                    const exactPos = realGroup[idx] && realGroup[idx].tla === team;
+                    
+                    if (isClassifiedPred && isClassifiedReal) ptSum += 5;
+                    if (exactPos) ptSum += 3;
+                }
+                groupPtsTotal += ptSum;
+                resultStr += `${idx+1}º ${team} (+${ptSum}), `;
+            });
+            resultStr = resultStr.slice(0, -2); // quitar última coma
+
+            groupData.push([`Grupo ${groupId}`, resultStr, `+${groupPtsTotal}`]);
+        });
+    }
+
+    if (groupData.length > 0) {
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Clasificación de Grupos", 14, startY);
+        doc.autoTable({
+            startY: startY + 4,
+            head: [['Grupo', 'Tus Clasificados (1º, 2º, 3º)', 'Puntos']],
+            body: groupData,
+            theme: 'striped',
+            headStyles: { fillColor: [0, 242, 254] },
+            styles: { fontSize: 9, halign: 'center' },
+            columnStyles: {
+                1: { halign: 'left' }
+            }
+        });
+        startY = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Procesar Preguntas
+    let questionsData = [];
+    if (p.predictions.specialQuestionsAnswers && p.predictions.specialQuestionsAnswers.length > 0) {
+        p.predictions.specialQuestionsAnswers.forEach(qAns => {
+            const off = globalOfficialAnswers.find(o => o.question === qAns.question);
+            let pts = 0;
+            let status = "Pendiente";
+            let realAns = off ? (off.answer || "") : "";
+
+            if (off && off.answer !== null && off.answer !== "") {
+                const ans1 = qAns.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const ans2 = off.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const validAnswers = ans2.split(',').map(a => a.trim());
+                if (validAnswers.includes(ans1)) {
+                    pts = off.points;
+                    status = "Correcto";
+                } else {
+                    status = "Incorrecto";
+                }
+            }
+            
+            questionsData.push([
+                qAns.question,
+                qAns.answer,
+                realAns,
+                pts > 0 ? `+${pts}` : `0 (${status})`
+            ]);
+        });
+    }
+
+    if (questionsData.length > 0) {
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Preguntas Especiales", 14, startY);
+        doc.autoTable({
+            startY: startY + 4,
+            head: [['Pregunta', 'Tu Respuesta', 'Oficial', 'Puntos']],
+            body: questionsData,
+            theme: 'striped',
+            headStyles: { fillColor: [255, 207, 0] },
+            styles: { fontSize: 8, halign: 'center' },
+            columnStyles: {
+                0: { halign: 'left', cellWidth: 70 },
+                1: { halign: 'left' },
+                2: { halign: 'left' }
+            }
+        });
+        startY = doc.lastAutoTable.finalY + 15;
+    }
+
     // Obtener los puntos totales del engine
     let basePts = 0;
     let livePts = 0;
@@ -1336,20 +1433,26 @@ window.generateParticipantPDF = function() {
         specialPts = rankingData.specialPoints || 0;
     }
 
+    // Check if we need to add a new page for the final summary if it exceeds page height
+    if (startY > doc.internal.pageSize.height - 40) {
+        doc.addPage();
+        startY = 20;
+    }
+
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("Resumen de Puntos Actuales:", 14, finalY);
+    doc.text("Resumen de Puntos Actuales:", 14, startY);
     
     doc.setFontSize(10);
     doc.setTextColor(50, 50, 50);
-    doc.text(`- Puntos por Partidos: ${basePts + livePts}`, 14, finalY + 6);
-    doc.text(`- Puntos por Grupos (Prov): ${groupPts}`, 14, finalY + 12);
-    doc.text(`- Puntos Especiales: ${specialPts}`, 14, finalY + 18);
+    doc.text(`- Puntos por Partidos: ${basePts + livePts}`, 14, startY + 6);
+    doc.text(`- Puntos por Grupos (Prov): ${groupPts}`, 14, startY + 12);
+    doc.text(`- Puntos Especiales: ${specialPts}`, 14, startY + 18);
     
     doc.setFontSize(14);
     doc.setTextColor(255, 51, 102);
     const totalPts = basePts + livePts + groupPts + specialPts;
-    doc.text(`Total Acumulado: ${totalPts} pts`, 14, finalY + 28);
+    doc.text(`Total Acumulado: ${totalPts} pts`, 14, startY + 28);
 
     doc.save(`informe_porra_${p.name.replace(/\s+/g, '_')}.pdf`);
 };
