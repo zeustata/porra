@@ -427,7 +427,8 @@ function calculateScores(participants, realResults, officialAnswers = []) {
                     // Normalizar respuestas a minúsculas y quitar tildes para evitar fallos ortográficos (ej: "Sí" vs "Si")
                     const ans1 = pAnswer.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     const ans2 = off.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    if (ans1 === ans2) {
+                    const validAnswers = ans2.split(',').map(a => a.trim());
+                    if (validAnswers.includes(ans1)) {
                         specialPts += off.points;
                     }
                 }
@@ -1049,7 +1050,8 @@ function showParticipantPredictions(participantId) {
             if (off && off.answer !== null && off.answer !== "") {
                 const ans1 = qAns.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 const ans2 = off.answer.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (ans1 === ans2) {
+                const validAnswers = ans2.split(',').map(a => a.trim());
+                if (validAnswers.includes(ans1)) {
                     statusHtml = `<span style="color: var(--neon-gold); font-weight: bold; font-size: 0.75rem;">✔ +${off.points} pts</span>`;
                     rowStyle = 'background: rgba(255, 207, 0, 0.05); border: 1px solid rgba(255, 207, 0, 0.2);';
                 } else {
