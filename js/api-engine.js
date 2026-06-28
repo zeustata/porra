@@ -557,11 +557,11 @@ window.cycleLeaderboardMode = function() {
     if (!btn) return;
     
     if (window.currentLeaderboardMode === 0) {
-        btn.innerText = 'En Vivo! 🔴';
-        btn.style.color = '#ff3366';
-        btn.style.borderColor = '#ff3366';
-        btn.style.background = 'rgba(255,51,102,0.1)';
-        btn.style.boxShadow = '0 0 10px rgba(255,51,102,0.3)';
+        btn.innerText = 'Clasificación Grupos 📊';
+        btn.style.color = '#ff00ff';
+        btn.style.borderColor = '#ff00ff';
+        btn.style.background = 'rgba(255,0,255,0.1)';
+        btn.style.boxShadow = '0 0 10px rgba(255,0,255,0.3)';
     } else if (window.currentLeaderboardMode === 1) {
         btn.innerText = 'Clasificación Base 🔵';
         btn.style.color = 'var(--neon-cyan)';
@@ -605,10 +605,12 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
     let displayLeaderboard = [...leaderboard];
     
     if (!isQuestions) {
-        if (window.currentLeaderboardMode === 1) {
+        if (window.currentLeaderboardMode === 0) {
+            displayLeaderboard.sort((a, b) => b.groupPoints - a.groupPoints);
+        } else if (window.currentLeaderboardMode === 1) {
             displayLeaderboard.sort((a, b) => b.basePoints - a.basePoints);
         } else if (window.currentLeaderboardMode === 2) {
-            displayLeaderboard.sort((a, b) => (b.basePoints + b.specialPoints) - (a.basePoints + a.specialPoints));
+            displayLeaderboard.sort((a, b) => (b.basePoints + b.specialPoints + b.groupPoints) - (a.basePoints + a.specialPoints + a.groupPoints));
         }
     }
 
@@ -642,10 +644,12 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
         
         if (!isQuestions) {
             let displayPoints = p.points;
-            if (window.currentLeaderboardMode === 1) {
+            if (window.currentLeaderboardMode === 0) {
+                displayPoints = p.groupPoints;
+            } else if (window.currentLeaderboardMode === 1) {
                 displayPoints = p.basePoints;
             } else if (window.currentLeaderboardMode === 2) {
-                displayPoints = p.basePoints + p.specialPoints;
+                displayPoints = p.basePoints + p.specialPoints + p.groupPoints;
             }
 
             pointsHtml = `<div style="text-align: right;">`;
@@ -653,19 +657,13 @@ function renderLeaderboardList(elementId, btnId, leaderboard, showFull, isQuesti
             pointsHtml += `<div style="font-size: 0.75rem; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 2px;">`;
             
             if (window.currentLeaderboardMode === 0) {
-                pointsHtml += `<span style="color:var(--text-muted)" title="Puntos definitivos de partidos finalizados">${p.basePoints} base</span>`;
-                if (p.livePoints > 0) {
-                    pointsHtml += `<span style="color:var(--neon-gold); animation: pulse 1.5s infinite;" title="Puntos provisionales de partidos en juego">+${p.livePoints} live 🔴</span>`;
-                    nameStyle = 'color: var(--neon-gold); font-weight: 600; text-shadow: 0 0 8px rgba(255,207,0,0.2);';
-                }
-                if (p.groupPoints > 0) {
-                    pointsHtml += `<span style="color:var(--neon-magenta);" title="Puntos provisionales por clasificación de grupo">+${p.groupPoints} prov 📊</span>`;
-                }
+                pointsHtml += `<span style="color:var(--neon-magenta);" title="Puntos por clasificación de grupo">${p.groupPoints} grupos 📊</span>`;
             } else if (window.currentLeaderboardMode === 1) {
                 pointsHtml += `<span style="color:var(--neon-cyan)" title="Solo puntos de partidos finalizados">${p.basePoints} base</span>`;
             } else if (window.currentLeaderboardMode === 2) {
                 pointsHtml += `<span style="color:var(--neon-cyan)" title="Puntos de partidos finalizados">${p.basePoints} base</span>`;
                 pointsHtml += `<span style="color:var(--neon-gold)" title="Puntos de preguntas especiales">+${p.specialPoints} preg</span>`;
+                pointsHtml += `<span style="color:var(--neon-magenta)" title="Puntos de clasificación de grupos">+${p.groupPoints} grupos</span>`;
             }
             
             pointsHtml += `</div></div>`;
