@@ -1331,7 +1331,6 @@ window.generateParticipantPDF = function() {
             let groupPtsTotal = 0;
 
             predGroup.forEach((team, idx) => {
-                if (idx > 2) return; // Sólo nos importan los 3 primeros si es que pasaran 3
                 let ptSum = 0;
                 if (realGroup && realGroup.length > 0) {
                     const isClassifiedReal = globalClassifiedTlasList.includes(team);
@@ -1356,7 +1355,7 @@ window.generateParticipantPDF = function() {
         doc.text("Clasificación de Grupos", 14, startY);
         doc.autoTable({
             startY: startY + 4,
-            head: [['Grupo', 'Tus Clasificados (1º, 2º, 3º)', 'Puntos']],
+            head: [['Grupo', 'Tu Predicción (1º al 4º)', 'Puntos']],
             body: groupData,
             theme: 'striped',
             headStyles: { fillColor: [0, 242, 254] },
