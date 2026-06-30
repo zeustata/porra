@@ -394,13 +394,19 @@ function calculateScores(participants, realResults, officialAnswers = []) {
 
     // --- 0. PRE-CALCULAR CLASIFICADOS DE FASE DE GRUPOS ---
     let globalClassifiedTlas = [];
+    let globalTop2Tlas = [];
+    let globalBestThirdsTlas = [];
     if (realResults.groupStandings && Object.keys(realResults.groupStandings).length > 0) {
         let allThirds = [];
         Object.keys(realResults.groupStandings).forEach(groupId => {
             const groupTeams = realResults.groupStandings[groupId];
             if (groupTeams.length > 0) {
+                globalTop2Tlas.push(groupTeams[0].tla);
                 globalClassifiedTlas.push(groupTeams[0].tla); // 1º
-                if (groupTeams.length > 1) globalClassifiedTlas.push(groupTeams[1].tla); // 2º
+                if (groupTeams.length > 1) {
+                    globalTop2Tlas.push(groupTeams[1].tla);
+                    globalClassifiedTlas.push(groupTeams[1].tla); // 2º
+                }
                 if (groupTeams.length > 2) allThirds.push(groupTeams[2]); // 3º
             }
         });
@@ -412,7 +418,10 @@ function calculateScores(participants, realResults, officialAnswers = []) {
         });
         // Sumar los 8 mejores terceros a la lista global
         const best8Thirds = allThirds.slice(0, 8);
-        best8Thirds.forEach(t => globalClassifiedTlas.push(t.tla));
+        best8Thirds.forEach(t => {
+            globalClassifiedTlas.push(t.tla);
+            globalBestThirdsTlas.push(t.tla);
+        });
     }
     globalClassifiedTlasList = globalClassifiedTlas;
 
@@ -496,14 +505,21 @@ function calculateScores(participants, realResults, officialAnswers = []) {
                 const realGroup = realResults.groupStandings[groupId];
                 if (!realGroup || realGroup.length === 0) return; 
                 
-                // Se apuesta que clasifican los que pones 1º, 2º y 3º
-                const predClassified = predGroup.slice(0, 3);
-
-                predClassified.forEach(team => {
-                    if (globalClassifiedTlas.includes(team)) {
-                        groupPoints += 5; // Acertó que el equipo se clasifica
+                // Los que pones 1º y 2º solo suman 5 puntos si clasifican COMO 1º o 2º (directos)
+                const predTop2 = predGroup.slice(0, 2);
+                predTop2.forEach(team => {
+                    if (globalTop2Tlas.includes(team)) {
+                        groupPoints += 5; // Acertó que clasifica como 1º o 2º
                     }
                 });
+
+                // El que pones 3º solo suma si clasifica COMO uno de los 8 mejores terceros
+                if (predGroup.length > 2) {
+                    const predThird = predGroup[2];
+                    if (globalBestThirdsTlas.includes(predThird)) {
+                        groupPoints += 5; // Acertó que clasifica como mejor tercero
+                    }
+                }
 
                 predGroup.forEach((team, index) => {
                     if (realGroup[index] && realGroup[index].tla === team) {
