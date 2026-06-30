@@ -1016,13 +1016,20 @@ function showParticipantPredictions(participantId) {
                     <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
             `;
             
+            let numClassifiedFromThisGroup = 0;
+            if (realGroup && realGroup.length > 0) {
+                realGroup.forEach(rt => {
+                    if (globalClassifiedTlasList.includes(rt.tla)) numClassifiedFromThisGroup++;
+                });
+            }
+
             predGroup.forEach((team, idx) => {
                 let statusIcon = '';
                 let teamColor = 'var(--text-light)';
                 
                 if (realGroup && realGroup.length > 0) {
                     const isClassifiedReal = globalClassifiedTlasList.includes(team);
-                    const isClassifiedPred = idx < 3;
+                    const isClassifiedPred = idx < numClassifiedFromThisGroup;
                     const exactPos = realGroup[idx] && realGroup[idx].tla === team;
                     
                     let ptSum = 0;
@@ -1348,11 +1355,18 @@ window.generateParticipantPDF = function() {
             let resultStr = "";
             let groupPtsTotal = 0;
 
+            let numClassifiedFromThisGroup = 0;
+            if (realGroup && realGroup.length > 0) {
+                realGroup.forEach(rt => {
+                    if (globalClassifiedTlasList.includes(rt.tla)) numClassifiedFromThisGroup++;
+                });
+            }
+
             predGroup.forEach((team, idx) => {
                 let ptSum = 0;
                 if (realGroup && realGroup.length > 0) {
                     const isClassifiedReal = globalClassifiedTlasList.includes(team);
-                    const isClassifiedPred = idx < 3;
+                    const isClassifiedPred = idx < numClassifiedFromThisGroup;
                     const exactPos = realGroup[idx] && realGroup[idx].tla === team;
                     
                     if (isClassifiedPred && isClassifiedReal) ptSum += 5;
