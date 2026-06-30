@@ -496,8 +496,16 @@ function calculateScores(participants, realResults, officialAnswers = []) {
                 const realGroup = realResults.groupStandings[groupId];
                 if (!realGroup || realGroup.length === 0) return; 
                 
-                // Se apuesta que clasifican los que pones 1º, 2º y 3º
-                const predClassified = predGroup.slice(0, 3);
+                // ¿Cuántos equipos se clasificaron en la realidad desde este grupo? (Serán 2 o 3)
+                let numClassifiedFromThisGroup = 0;
+                realGroup.forEach(rt => {
+                    if (globalClassifiedTlas.includes(rt.tla)) {
+                        numClassifiedFromThisGroup++;
+                    }
+                });
+
+                // Solo evaluamos los "N" primeros puestos del jugador, donde N es el número de clasificados reales del grupo
+                const predClassified = predGroup.slice(0, numClassifiedFromThisGroup);
 
                 predClassified.forEach(team => {
                     if (globalClassifiedTlas.includes(team)) {
