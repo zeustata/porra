@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Añadido viewport-fit=cover para compatibilidad total con móviles (notch, safe areas) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Porra Mundial 2026</title>
+    <title>Porra Champions League</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,17 +22,17 @@
 <body>
 
     <header>
-        <img src="logo.png" alt="Logo Porra Mundial" class="logo-img">
-        <h1>Mundial 2026</h1>
+        <img src="logo.png" alt="Logo Porra Champions" class="logo-img">
+        <h1>Champions League</h1>
         <p class="subtitle">La Plataforma Definitiva de Pronósticos</p>
     </header>
 
     <div class="container">
         <!-- Tarjeta Clasificación Fase de Grupos -->
         <div class="glass-card main-card">
-            <h2>🏆 Clasificación Fase de Grupos</h2>
+            <h2>🏆 Clasificación Fase de Liga</h2>
             <div style="display: flex; justify-content: center; margin-top: -5px; margin-bottom: 15px;">
-                <button id="leaderboard-mode-btn" onclick="cycleLeaderboardMode()" style="background: rgba(255,0,255,0.1); color: #ff00ff; border: 1px solid #ff00ff; padding: 6px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(255,0,255,0.3); font-size: 0.9rem;">Clasificación Grupos 📊</button>
+                <button id="leaderboard-mode-btn" onclick="cycleLeaderboardMode()" style="background: rgba(255,0,255,0.1); color: #ff00ff; border: 1px solid #ff00ff; padding: 6px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(255,0,255,0.3); font-size: 0.9rem;">Clasificación Liga 📊</button>
             </div>
             <div class="leaderboard">
                 <div id="leaderboard-grupos" style="display:flex; flex-direction:column;">
@@ -42,31 +42,7 @@
             <button id="btn-ver-completa-grupos" onclick="toggleGruposLeaderboard()" style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; display: none;">Ver Completa</button>
         </div>
 
-        <!-- Tarjeta Clasificación Preguntas -->
-        <div class="glass-card">
-            <h2>🧠 Clasificación Preguntas</h2>
-            <div class="leaderboard">
-                <div id="leaderboard-preguntas" style="display:flex; flex-direction:column;">
-                    <p style="text-align:center; color:var(--text-muted);">Cargando clasificación de preguntas...</p>
-                </div>
-            </div>
-            <button id="btn-ver-completa-preguntas" onclick="togglePreguntasLeaderboard()" style="margin-top: 1rem; background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; display: none;">Ver Completa</button>
-        </div>
 
-        <!-- Tarjeta Clasificación Fase Final (Bloqueada) -->
-        <div class="glass-card locked-card" style="position: relative; overflow: hidden; opacity: 0.65; min-height: 180px;">
-            <div style="position: absolute; top: 18px; right: 20px; font-size: 1.3rem;">🔒</div>
-            <h2>⚔️ Clasificación Fase Final</h2>
-            <p style="font-size: 0.8rem; color: var(--neon-magenta); text-transform: uppercase; letter-spacing: 1px; margin-top: -8px; font-weight: bold; margin-bottom: 1rem;">Próximamente</p>
-            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; filter: blur(2.5px); user-select: none; pointer-events: none;">
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span>1. Lendo</span> <span><strong>0 pts</strong></span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span>2. Invitado</span> <span><strong>0 pts</strong></span>
-                </div>
-            </div>
-        </div>
 
         <div class="glass-card">
             <h2><span class="icon">⚽</span> Partidos de la Jornada</h2>
@@ -98,8 +74,8 @@
                 <p style="margin-bottom: 15px; text-align: center; color: var(--text-muted);">Pulsa el botón de clasificación (arriba de la tabla) para alternar entre:</p>
                 <ul class="legend-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;">
                     <li>
-                        <div style="margin-bottom: 4px;"><span style="color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.1); padding: 4px 8px; border-radius: 8px; display: inline-block; border: 1px solid #ff00ff;">Clasificación Grupos 📊</span></div>
-                        <span style="font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">Puntos obtenidos exclusivamente por acertar quién se clasifica de grupo y en qué orden.</span>
+                        <div style="margin-bottom: 4px;"><span style="color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.1); padding: 4px 8px; border-radius: 8px; display: inline-block; border: 1px solid #ff00ff;">Clasificación Liga 📊</span></div>
+                        <span style="font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">Puntos obtenidos exclusivamente por predecir a los clasificados y su orden.</span>
                     </li>
                     <li style="margin-top: 5px;">
                         <div style="margin-bottom: 4px;"><span style="color: var(--neon-cyan); font-weight: bold; background: rgba(0,242,254,0.1); padding: 4px 8px; border-radius: 8px; display: inline-block; border: 1px solid var(--neon-cyan);">Clasificación Base 🔵</span></div>
@@ -121,34 +97,7 @@
             </div>
         </div>
 
-        <!-- Nueva tarjeta de Recursos -->
-        <div class="glass-card expandable-card" onclick="this.classList.toggle('active')">
-            <h2><span class="icon">📦</span> Recursos <span class="chevron-icon">▼</span></h2>
-            <div class="content-panel" onclick="event.stopPropagation()">
-                <p style="margin-bottom: 1rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">Haz clic para ver o descargar</p>
-                <button onclick="openViewer('recurso1.png', 'Plantilla Grupos')" class="resource-btn">📥 Plantilla Grupos</button>
-                <button onclick="openViewer('recurso2.png', 'Plantilla Preguntas')" class="resource-btn">📥 Plantilla Preguntas</button>
-                <button onclick="openViewer('recurso3.png', 'Plantilla Puntuaciones')" class="resource-btn">📥 Plantilla Puntuaciones</button>
-            </div>
-        </div>
 
-
-        <div class="glass-card">
-            <h2><span class="icon">💰</span> Premios (Bote: 480€)</h2>
-            <div style="padding: 1rem 0;">
-                <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size: 0.95rem;">
-                    <li style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>1º Clasificado</span> <strong style="color:var(--neon-gold); font-size:1.1rem;">192€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(40%)</span></strong></li>
-                    <li style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>2º Clasificado</span> <strong style="color:var(--text-light); font-size:1.05rem;">120€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(25%)</span></strong></li>
-                    <li style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>3º Clasificado</span> <strong style="color:#e0a96d; font-size:1rem;">72€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(15%)</span></strong></li>
-                    <li style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>4º Clasificado</span> <strong>48€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(10%)</span></strong></li>
-                    <li style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><span>5º Clasificado</span> <strong>24€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(5%)</span></strong></li>
-                    <li style="display:flex; justify-content:space-between; padding-top:5px;"><span>Mejor en Preguntas</span> <strong style="color:var(--neon-cyan)">24€ <span style="font-size:0.8rem; font-weight:normal; color:rgba(255,255,255,0.5);">(5%)</span></strong></li>
-                </ul>
-                <div style="margin-top: 15px; font-size: 0.75rem; color: var(--text-muted); text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                    * En caso de empate a puntos, se sumarán los premios de las posiciones afectadas y se repartirán a partes iguales.
-                </div>
-            </div>
-        </div>
 
         <div class="glass-card">
             <h2><span class="icon">📰</span> Últimas Noticias</h2>

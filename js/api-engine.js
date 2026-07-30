@@ -63,8 +63,8 @@ async function initEngine() {
         let data = null;
         
         try {
-            const CACHE_KEY = "wc_matches_cache_v8";
-            const CACHE_TIME_KEY = "wc_matches_cache_time_v8";
+            const CACHE_KEY = "cl_matches_cache_v1";
+            const CACHE_TIME_KEY = "cl_matches_cache_time_v1";
             // Jitter no es tan crítico ahora, pero lo dejamos por seguridad.
             const CACHE_DURATION_MS = 60000; // 1 minuto, GitHub Action se actualiza cada 5.
             
@@ -101,7 +101,7 @@ async function initEngine() {
         
         // Fallback de contingencia a la caché o datos simulados si la carga falló
         if (!data) {
-            const cachedData = localStorage.getItem("wc_matches_cache_v6");
+            const cachedData = localStorage.getItem("cl_matches_cache_v1");
             if (cachedData) {
                 try {
                     data = JSON.parse(cachedData);
@@ -130,8 +130,8 @@ async function initEngine() {
             const allMatches = data.matches;
             globalAllMatches = allMatches; // Guardar globalmente para búsquedas
             
-            // Mapear partidos de fase de grupos terminados o en juego
-            realResults.matches = allMatches.filter(m => m.stage === "GROUP_STAGE").map(m => ({
+            // Mapear partidos de fase de liga terminados o en juego
+            realResults.matches = allMatches.filter(m => m.stage === "LEAGUE_STAGE").map(m => ({
                 matchId: m.id,
                 homeTeam: m.homeTeam.name,
                 awayTeam: m.awayTeam.name,
@@ -211,40 +211,24 @@ function getNextMatch(allMatches) {
             date: new Date(next.utcDate)
         };
     }
-    
-    // Fallback simulado si no hay partidos futuros cargados (solo válido durante la inauguración)
-    const fallbackDate = new Date("2026-06-11T19:00:00Z");
-    if (Date.now() < fallbackDate.getTime() + (3 * 60 * 60 * 1000)) { // Expira a las 22:00 UTC (00:00 España)
-        return {
-            id: 1,
-            homeTeam: "México",
-            awayTeam: "Sudáfrica",
-            date: fallbackDate
-        };
-    }
     return null;
 }
 
 function calculateGroupStandings(matches) {
-    const standings = {};
-    const finishedCount = {};
+    const standings = { "LIGA": {} };
+    let finishedCount = 0;
     
-    // 1. Inicializar los equipos de cada grupo
+    // 1. Inicializar los equipos de la liga
     matches.forEach(m => {
-        if (m.stage === "GROUP_STAGE" && m.group) {
-            const groupLetter = m.group.replace("Group ", "").replace("GROUP_", "").trim();
-            if (!standings[groupLetter]) {
-                standings[groupLetter] = {};
-                finishedCount[groupLetter] = 0;
-            }
+        if (m.stage === "LEAGUE_STAGE") {
             if (m.homeTeam && m.homeTeam.tla) {
-                if (!standings[groupLetter][m.homeTeam.tla]) {
-                    standings[groupLetter][m.homeTeam.tla] = { tla: m.homeTeam.tla, pts: 0, gd: 0, gf: 0 };
+                if (!standings["LIGA"][m.homeTeam.tla]) {
+                    standings["LIGA"][m.homeTeam.tla] = { tla: m.homeTeam.tla, pts: 0, gd: 0, gf: 0 };
                 }
             }
             if (m.awayTeam && m.awayTeam.tla) {
-                if (!standings[groupLetter][m.awayTeam.tla]) {
-                    standings[groupLetter][m.awayTeam.tla] = { tla: m.awayTeam.tla, pts: 0, gd: 0, gf: 0 };
+                if (!standings["LIGA"][m.awayTeam.tla]) {
+                    standings["LIGA"][m.awayTeam.tla] = { tla: m.awayTeam.tla, pts: 0, gd: 0, gf: 0 };
                 }
             }
         }
@@ -252,18 +236,17 @@ function calculateGroupStandings(matches) {
 
     // 2. Acumular estadísticas de partidos finalizados
     matches.forEach(m => {
-        if (m.stage === "GROUP_STAGE" && m.status === "FINISHED" && m.group) {
-            const groupLetter = m.group.replace("Group ", "").replace("GROUP_", "").trim();
+        if (m.stage === "LEAGUE_STAGE" && m.status === "FINISHED") {
             const homeTla = m.homeTeam.tla;
             const awayTla = m.awayTeam.tla;
             
             const homeGoals = (m.score && m.score.fullTime) ? m.score.fullTime.home : null;
             const awayGoals = (m.score && m.score.fullTime) ? m.score.fullTime.away : null;
             
-            if (homeGoals !== null && awayGoals !== null && standings[groupLetter][homeTla] && standings[groupLetter][awayTla]) {
-                finishedCount[groupLetter]++;
-                const home = standings[groupLetter][homeTla];
-                const away = standings[groupLetter][awayTla];
+            if (homeGoals !== null && awayGoals !== null && standings["LIGA"][homeTla] && standings["LIGA"][awayTla]) {
+                finishedCount++;
+                const home = standings["LIGA"][homeTla];
+                const away = standings["LIGA"][awayTla];
                 
                 home.gf += homeGoals;
                 home.gd += (homeGoals - awayGoals);
@@ -282,21 +265,17 @@ function calculateGroupStandings(matches) {
         }
     });
 
-    // 3. Ordenar cada grupo por criterios FIFA estándar
+    // 3. Ordenar la liga por criterios estándar
     const sortedStandings = {};
-    Object.keys(standings).forEach(groupLetter => {
-        // Solo calculamos clasificación real si se ha jugado al menos un partido en el grupo
-        if (!finishedCount[groupLetter] || finishedCount[groupLetter] === 0) {
-            return;
-        }
-        const teams = Object.values(standings[groupLetter]);
+    if (finishedCount > 0) {
+        const teams = Object.values(standings["LIGA"]);
         teams.sort((a, b) => {
             if (b.pts !== a.pts) return b.pts - a.pts;
             if (b.gd !== a.gd) return b.gd - a.gd;
             return b.gf - a.gf;
         });
-        sortedStandings[groupLetter] = teams;
-    });
+        sortedStandings["LIGA"] = teams;
+    }
 
     return sortedStandings;
 }

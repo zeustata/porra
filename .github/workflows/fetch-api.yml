@@ -25,7 +25,7 @@ jobs:
           git pull origin api-data || echo "Creando rama por primera vez"
           
           echo "Descargando datos de football-data.org..."
-          HTTP_STATUS=$(curl -s -o api_cache_temp.json -w "%{http_code}" -H "X-Auth-Token: eb33115c8c4843729c576baff6e57958" "https://api.football-data.org/v4/competitions/WC/matches")
+          HTTP_STATUS=$(curl -s -o api_cache_temp.json -w "%{http_code}" -H "X-Auth-Token: eb33115c8c4843729c576baff6e57958" "https://api.football-data.org/v4/competitions/CL/matches")
           
           if [ "$HTTP_STATUS" -eq 200 ]; then
               echo "Éxito (200). Guardando JSON."
