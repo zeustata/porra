@@ -13,11 +13,11 @@
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Porra 26">
+    <meta name="apple-mobile-web-app-title" content="Porra CL">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="logo.png?v=2" type="image/png">
     <link rel="apple-touch-icon" href="logo.png?v=2">
-    <link rel="stylesheet" href="css/style.css?v=74">
+    <link rel="stylesheet" href="css/style.css?v=75">
 </head>
 <body>
 
@@ -95,7 +95,7 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
-    <script src="js/api-engine.js?v=74"></script>
+    <script src="js/api-engine.js?v=75"></script>
     <script>
         // Lógica del Visor de Medios
         function openViewer(src, title) {
@@ -125,7 +125,7 @@
         // 1. Registrar Service Worker con Recarga Automática en Actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=74')
+                navigator.serviceWorker.register('sw.js?v=75')
                     .then(registration => {
                         console.log('ServiceWorker registrado con éxito');
                         // Forzar comprobación de actualizaciones del Service Worker
