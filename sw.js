@@ -1,9 +1,9 @@
-const CACHE_NAME = 'porra-cache-v86';
+const CACHE_NAME = 'porra-cache-v87';
 const ASSETS = [
     './',
     './index.html',
     './css/style.css?v=74',
-    './logo.png',
+    './logo.png?v=2',
     './manifest.json',
     './js/api-engine.js?v=76',
     './data/participants.json?v=74',
